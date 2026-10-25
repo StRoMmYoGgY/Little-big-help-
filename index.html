@@ -7,28 +7,46 @@
     <meta name="theme-color" content="#f3f0e7" />
     <meta
       name="description"
-      content="Little Big Help makes finding reliable local services simple, friendly, and stress-free."
+      content="Little Big Help makes finding reliable local services simple, friendly, and stress-free. Small tasks, big relief."
     />
+
+    <!-- Social Media Metadata (Open Graph & Twitter) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Little Big Help | Small Tasks, Big Relief" />
+    <meta
+      property="og:description"
+      content="From everyday tasks to finding the right local help, Little Big Help connects people with practical, stress-free support."
+    />
+    <meta property="og:image" content="assets/images/interlocking-relief-social-tile.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+
     <title>Little Big Help | Small Tasks, Big Relief</title>
+    
     <link rel="stylesheet" href="style.css" />
     <meta name="api-base-url" content="/api" />
   </head>
   <body>
+    <!-- Site Navigation Header -->
     <header class="site-header">
       <nav class="navbar" aria-label="Main navigation">
         <a href="#home" class="brand" aria-label="Little Big Help home">
           <img
             src="assets/images/interlocking-relief-social-tile.png"
-            alt="Little Big Help"
+            alt=""
             class="brand-logo"
+            width="40"
+            height="40"
           />
-          <span class="brand-text">Little Big Help</span>
+          <span class="brand-copy">
+            <span class="brand-text">Little Big Help</span>
+            <span class="brand-subtitle">Small Tasks, Big Relief</span>
+          </span>
         </a>
 
         <button
           class="menu-toggle"
           type="button"
-          aria-label="Open navigation menu"
+          aria-label="Toggle navigation menu"
           aria-expanded="false"
           aria-controls="nav-links"
         >
@@ -36,7 +54,7 @@
         </button>
 
         <ul class="nav-links" id="nav-links">
-          <li><a href="#home">Home</a></li>
+          <li><a href="#home" aria-current="page">Home</a></li>
           <li><a href="#services">Our Services</a></li>
           <li><a href="#how-it-works">How It Works</a></li>
           <li><a href="#about">About Us</a></li>
@@ -47,12 +65,14 @@
       </nav>
     </header>
 
+    <!-- Main Content LandMark -->
     <main class="page-main">
-      <section class="hero" id="home">
+      <!-- Hero Section -->
+      <section class="hero" id="home" aria-labelledby="hero-title">
         <div class="hero-content reveal reveal-up">
-          <p class="eyebrow">Little Big Help</p>
+          <span class="eyebrow">Little Big Help</span>
           <p class="hero-tagline reveal reveal-up reveal-delay-1">Small Tasks, Big Relief.</p>
-          <h1 class="reveal reveal-up reveal-delay-2">
+          <h1 id="hero-title" class="reveal reveal-up reveal-delay-2">
             Life gets busy.<br />
             <span>We make it easier.</span>
           </h1>
@@ -81,10 +101,11 @@
         </div>
       </section>
 
-      <section class="services section" id="services">
+      <!-- Services Section -->
+      <section class="services section" id="services" aria-labelledby="services-title">
         <div class="section-heading reveal reveal-up">
-          <p class="eyebrow">How we can help</p>
-          <h2>What do you need a hand with?</h2>
+          <span class="eyebrow">How we can help</span>
+          <h2 id="services-title">What do you need a hand with?</h2>
           <p>
             Everyone needs a little help sometimes. Tell us what you need, and let's find
             a simple solution together.
@@ -93,40 +114,47 @@
 
         <div class="service-grid">
           <article class="service-card reveal reveal-up">
-            <span class="service-icon" aria-hidden="true">⌂</span>
+            <span class="service-icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+            </span>
             <h3>Everyday Help</h3>
             <p>
               Practical support with daily tasks and the little things that tend to pile up.
             </p>
-            <a href="#contact">Ask us about it →</a>
+            <a href="#contact">Ask us about it &rarr;</a>
           </article>
 
           <article class="service-card reveal reveal-up reveal-delay-1">
-            <span class="service-icon service-icon-sage" aria-hidden="true">↗</span>
+            <span class="service-icon service-icon-sage" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+            </span>
             <h3>Local Assistance</h3>
             <p>
               Get help finding trusted local services and connecting with the right people.
             </p>
-            <a href="#contact">Ask us about it →</a>
+            <a href="#contact">Ask us about it &rarr;</a>
           </article>
 
           <article class="service-card reveal reveal-up reveal-delay-2">
-            <span class="service-icon service-icon-warm" aria-hidden="true">✦</span>
+            <span class="service-icon service-icon-warm" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </span>
             <h3>Business Support</h3>
             <p>
               Helpful, friendly support for small businesses that need a little extra capacity.
             </p>
-            <a href="#contact">Ask us about it →</a>
+            <a href="#contact">Ask us about it &rarr;</a>
           </article>
         </div>
 
         <p class="service-disclaimer">Need something different? Tell us what you have in mind.</p>
       </section>
 
-      <section class="how-it-works section" id="how-it-works">
+      <!-- How It Works Section -->
+      <section class="how-it-works section" id="how-it-works" aria-labelledby="steps-title">
         <div class="section-heading reveal reveal-up">
-          <p class="eyebrow">Simple by design</p>
-          <h2>Getting help shouldn't be hard.</h2>
+          <span class="eyebrow">Simple by design</span>
+          <h2 id="steps-title">Getting help shouldn't be hard.</h2>
         </div>
 
         <div class="steps-grid">
@@ -150,10 +178,11 @@
         </div>
       </section>
 
-      <section class="about section" id="about">
+      <!-- About Section -->
+      <section class="about section" id="about" aria-labelledby="about-title">
         <div class="about-content reveal reveal-up">
-          <p class="eyebrow">A little about us</p>
-          <h2>Big on care. Small on hassle.</h2>
+          <span class="eyebrow">A little about us</span>
+          <h2 id="about-title">Big on care. Small on hassle.</h2>
           <p>
             We believe getting help should feel easy, welcoming, and straightforward. Little
             Big Help is built around understanding what people need and helping them find
@@ -164,10 +193,11 @@
         </div>
       </section>
 
-      <section class="contact section" id="contact">
+      <!-- Contact Section -->
+      <section class="contact section" id="contact" aria-labelledby="contact-title">
         <div class="contact-content reveal reveal-up">
-          <p class="eyebrow">Let's make life easier</p>
-          <h2>What's one thing we can help with?</h2>
+          <span class="eyebrow">Let's make life easier</span>
+          <h2 id="contact-title">What's one thing we can help with?</h2>
           <p>Send us a message. Tell us what you need, and let's see how we can help.</p>
 
           <div class="contact-options" aria-label="Contact options">
@@ -178,16 +208,16 @@
               rel="noopener noreferrer"
               aria-label="Chat with Little Big Help on WhatsApp"
             >
-              <span class="contact-icon" aria-hidden="true">✆</span>
+              <span class="contact-icon" aria-hidden="true">💬</span>
               <span class="contact-copy">
                 <strong>WhatsApp</strong>
                 <small>Chat with us</small>
               </span>
-              <span class="contact-detail">https://wa.me/8801865383565</span>
+              <span class="contact-detail">01865383565</span>
             </a>
 
             <a class="contact-option" href="tel:+8801865383565" aria-label="Call Little Big Help on 01865383565">
-              <span class="contact-icon" aria-hidden="true">☎</span>
+              <span class="contact-icon" aria-hidden="true">📞</span>
               <span class="contact-copy">
                 <strong>Phone</strong>
                 <small>01865383565</small>
@@ -200,7 +230,7 @@
               href="mailto:littlebighelp28@gmail.com"
               aria-label="Email Little Big Help at littlebighelp28@gmail.com"
             >
-              <span class="contact-icon" aria-hidden="true">✉</span>
+              <span class="contact-icon" aria-hidden="true">✉️</span>
               <span class="contact-copy">
                 <strong>Email</strong>
                 <small>littlebighelp28@gmail.com</small>
@@ -215,7 +245,7 @@
               rel="noopener noreferrer"
               aria-label="Follow Little Big Help on Instagram"
             >
-              <span class="contact-icon" aria-hidden="true">◎</span>
+              <span class="contact-icon" aria-hidden="true">📷</span>
               <span class="contact-copy">
                 <strong>Instagram</strong>
                 <small>Follow us</small>
@@ -230,7 +260,7 @@
               rel="noopener noreferrer"
               aria-label="Visit Little Big Help on Facebook"
             >
-              <span class="contact-icon" aria-hidden="true">◌</span>
+              <span class="contact-icon" aria-hidden="true">🌐</span>
               <span class="contact-copy">
                 <strong>Facebook</strong>
                 <small>Visit our page</small>
@@ -242,14 +272,29 @@
       </section>
     </main>
 
+    <!-- Footer -->
     <footer class="site-footer">
       <a href="#home" class="footer-brand">Little Big Help</a>
       <p>A little help goes a long way.</p>
       <p class="copyright">&copy; <span id="current-year">2026</span> Little Big Help. All rights reserved.</p>
     </footer>
 
+    <!-- Floating Action Widget -->
     <a
       href="https://wa.me/8801865383565"
+      class="floating-whatsapp"
+      data-floating-whatsapp="true"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Chat with Little Big Help on WhatsApp"
+    >
+      WhatsApp
+    </a>
+
+    <script src="script.js" defer></script>
+  </body>
+</html>
+ref="https://wa.me/8801865383565"
       class="floating-whatsapp"
       data-floating-whatsapp="true"
       target="_blank"
