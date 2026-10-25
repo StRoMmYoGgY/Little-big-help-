@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <filter id="wa-shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+  <!-- Outer Speech Bubble with White Halo and Black Outline -->
+  <g filter="url(#wa-shadow)">
+    <!-- White outer rim -->
+    <path d="M256 36 C136.7 36 40 132.7 40 252 c0 41.5 11.8 80.3 32.2 113.3 L42 470 l108.6 -28.5 c31.4 17.5 67.4 27.5 105.4 27.5 119.3 0 216 -96.7 216 -217 S375.3 36 256 36 Z" 
+          fill="#FFFFFF" stroke="#000000" stroke-width="14" stroke-linejoin="round"/>
+    
+    <!-- Inner Green Fill -->
+    <path d="M256 56 C147.8 56 60 143.8 60 252 c0 37.7 10.7 72.9 29.2 102.8 l-20.2 74 76.5 -20.1 c28.5 15.6 61.2 24.3 95.5 24.3 108.2 0 196 -87.8 196 -197 S364.2 56 256 56 Z" 
+          fill="#84D27C" stroke="#000000" stroke-width="12" stroke-linejoin="round"/>
+
+    <!-- Subtle Top-Left Inner Light Arc -->
+    <path d="M120 120 A170 170 0 0 1 290 76" 
+          fill="none" stroke="#FFFFFF" stroke-width="10" stroke-linecap="round" opacity="0.65"/>
+    <path d="M100 170 A170 170 0 0 1 115 130" 
+          fill="none" stroke="#000000" stroke-width="8" stroke-linecap="round"/>
+
+    <!-- Phone Handset -->
+    <!-- Handset shadow/contour -->
+    <path d="M185 142 c-10 -10 -22 -10 -34 2 -14 14 -22 34 -20 54 4 44 26 88 64 126 38 38 82 60 126 64 20 2 40 -6 54 -20 12 -12 12 -24 2 -34 l-32 -32 c-9 -9 -21 -9 -30 0 l-14 14 c-6 6 -15 7 -22 3 -24 -14 -48 -38 -62 -62 -4 -7 -3 -16 3 -22 l14 -14 c9 -9 9 -21 0 -30 l-31 -31 Z" 
+          fill="#000000" />
+    <!-- Handset White Body -->
+    <path d="M180 138 c-8 -8 -18 -8 -28 2 -12 12 -18 28 -16 45 3 38 22 76 56 110 34 34 72 53 110 56 17 2 33 -4 45 -16 10 -10 10 -20 2 -28 l-28 -28 c-7 -7 -17 -7 -24 0 l-14 14 c-6 6 -14 7 -21 3 -22 -13 -44 -35 -57 -57 -4 -7 -3 -15 3 -21 l14 -14 c7 -7 7 -17 0 -24 l-28 -28 Z" 
+          fill="#FFFFFF" stroke="#000000" stroke-width="5" stroke-linejoin="round"/>
+  </g>
+</svg>

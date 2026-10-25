@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <clipPath id="squircle-clip">
+      <rect x="0" y="0" width="512" height="512" rx="128" ry="128" />
+    </clipPath>
+    <linearGradient id="lens-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#D92885"/>
+      <stop offset="50%" stop-color="#EA376C"/>
+      <stop offset="100%" stop-color="#F76B42"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Container Squircle with Colorful Background Rays -->
+  <g clip-path="url(#squircle-clip)">
+    <!-- Base background gradient -->
+    <rect width="512" height="512" fill="#D92885"/>
+    
+    <!-- Diagonal Colorful Strips -->
+    <!-- Top-left deep purple -->
+    <polygon points="0,0 200,0 0,200" fill="#2E2870" />
+    <polygon points="0,120 320,0 390,0 0,390" fill="#4C348E" opacity="0.9" />
+    <polygon points="0,260 460,0 512,0 512,40 0,470" fill="#882C94" />
+    <polygon points="0,380 512,80 512,180 0,512" fill="#BE2586" />
+    <polygon points="40,512 512,210 512,320 180,512" fill="#E62C65" />
+    <polygon points="170,512 512,340 512,440 320,512" fill="#F45C3E" />
+    <polygon points="310,512 512,440 512,512 430,512" fill="#F9A03F" />
+    <polygon points="420,512 512,480 512,512" fill="#FBD561" />
+
+    <!-- Soft overlay to blend seamlessly -->
+    <rect width="512" height="512" fill="url(#lens-gradient)" opacity="0.15" />
+
+    <!-- Center Black Camera Body -->
+    <rect x="52" y="52" width="408" height="408" rx="100" ry="100" fill="#000000" />
+
+    <!-- Camera Lens Ring -->
+    <circle cx="256" cy="256" r="150" fill="url(#lens-gradient)" />
+    <!-- Lens Center Hole -->
+    <circle cx="256" cy="256" r="88" fill="#000000" />
+
+    <!-- Flash Dot -->
+    <circle cx="396" cy="116" r="35" fill="url(#lens-gradient)" />
+  </g>
+</svg>

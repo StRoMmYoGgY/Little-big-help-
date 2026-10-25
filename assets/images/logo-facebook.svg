@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <clipPath id="fb-squircle-clip">
+      <rect x="0" y="0" width="512" height="512" rx="130" ry="130" />
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#fb-squircle-clip)">
+    <!-- Base Bright Blue -->
+    <rect width="512" height="512" fill="#1877F2"/>
+    
+    <!-- Right curved accent matching uploaded artwork -->
+    <path d="M 460 0 C 430 180 340 370 512 512 L 512 0 Z" fill="#3652A8" opacity="0.9" />
+
+    <!-- Left highlight rim -->
+    <path d="M 0 0 L 26 0 L 26 512 L 0 512 Z" fill="#4B95F8" opacity="0.6" />
+
+    <!-- Pure Facebook 'f' Lettermark -->
+    <path d="M 358 222 L 278 222 L 278 174 C 278 152 284 136 318 136 L 358 136 L 358 66 C 342 64 316 62 286 62 C 224 62 182 100 182 168 L 182 222 L 120 222 L 120 300 L 182 300 L 182 512 L 278 512 L 278 300 L 344 300 Z" fill="#FFFFFF"/>
+  </g>
+</svg>
