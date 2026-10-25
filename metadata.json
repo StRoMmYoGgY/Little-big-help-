@@ -1,0 +1,8 @@
+{
+  "name": "Little Big Help",
+  "description": "Little Big Help makes finding reliable local services simple, friendly, and stress-free. Small tasks, big relief.",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
