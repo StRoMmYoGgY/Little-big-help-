@@ -175,6 +175,15 @@ nav {
   color: var(--color-charcoal);
 }
 
+.brand-logo {
+  display: block;
+  width: 100%;
+  max-width: 180px;
+  max-height: 54px;
+  object-fit: contain;
+  object-position: left center;
+}
+
 .logo {
   width: clamp(2.7rem, 1.8rem + 1vw, 3.4rem);
   height: auto;
@@ -379,7 +388,7 @@ nav {
   border-radius: 50%;
   border: 2px solid rgba(233, 130, 114, 0.82);
   opacity: 0.95;
-  animation: orbitFloat 14s ease-in-out infinite alternate;
+  animation: orbitFloat 8s ease-in-out infinite alternate;
 }
 
 .hero-orbit-one {
@@ -396,7 +405,7 @@ nav {
   border-color: rgba(164, 199, 181, 0.88);
   border-right-color: rgba(164, 199, 181, 0.18);
   border-bottom-color: rgba(164, 199, 181, 0.18);
-  animation-duration: 16s;
+  animation-duration: 10s;
 }
 
 .hero-core {
@@ -541,6 +550,14 @@ nav {
   background: rgba(255, 255, 255, 0.2);
   border: 1px solid rgba(148, 135, 126, 0.2);
   border-radius: var(--radius-lg);
+  transition: transform var(--transition-med) ease, border-color var(--transition-med) ease, box-shadow var(--transition-med) ease;
+}
+
+.step:hover,
+.step:focus-within {
+  transform: translateY(-4px);
+  border-color: rgba(164, 199, 181, 0.7);
+  box-shadow: 0 18px 28px rgba(36, 35, 34, 0.06);
 }
 
 .step-number {
@@ -576,6 +593,14 @@ nav {
   border-radius: var(--radius-xl);
   background: rgba(255, 255, 255, 0.22);
   box-shadow: var(--shadow-soft);
+  transition: transform var(--transition-med) ease, border-color var(--transition-med) ease, box-shadow var(--transition-med) ease;
+}
+
+.about-content:hover,
+.about-content:focus-within {
+  transform: translateY(-4px);
+  border-color: rgba(233, 130, 114, 0.48);
+  box-shadow: 0 20px 34px rgba(36, 35, 34, 0.08);
 }
 
 .about-content p + p {
@@ -597,37 +622,81 @@ nav {
   box-shadow: var(--shadow-soft);
 }
 
-.contact-links {
+.contact-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+  margin: 1.75rem 0 0;
+  text-align: left;
+}
+
+.contact-option {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.8rem;
-  margin: 1.5rem 0 1.25rem;
-}
-
-.contact-link {
-  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  padding: 0.8rem 1.1rem;
-  border: 1px solid rgba(36, 35, 34, 0.16);
-  border-radius: 999px;
+  gap: 0.8rem;
+  min-height: 5rem;
+  padding: 1rem 1rem 0.95rem;
   background: rgba(255, 255, 255, 0.38);
+  border: 1px solid rgba(36, 35, 34, 0.14);
+  border-radius: 1.1rem;
   color: var(--color-charcoal);
-  font-weight: 600;
-  transition: background var(--transition-fast) ease, border-color var(--transition-fast) ease, transform var(--transition-fast) ease;
+  transition: transform var(--transition-med) ease, box-shadow var(--transition-med) ease, border-color var(--transition-med) ease, background var(--transition-med) ease;
 }
 
-.contact-link:hover,
-.contact-link:focus-visible {
-  border-color: rgba(233, 130, 114, 0.5);
-  background: rgba(233, 130, 114, 0.06);
-  transform: translateY(-1px);
+.contact-option:hover,
+.contact-option:focus-visible {
+  transform: translateY(-3px);
+  border-color: rgba(233, 130, 114, 0.52);
+  background: rgba(233, 130, 114, 0.05);
+  box-shadow: 0 18px 28px rgba(36, 35, 34, 0.06);
 }
 
-.contact-link-whatsapp {
-  background: rgba(164, 199, 181, 0.16);
-  border-color: rgba(164, 199, 181, 0.6);
+.contact-option:nth-child(odd) {
+  background: rgba(255, 255, 255, 0.44);
+}
+
+.contact-option:nth-child(3),
+.contact-option:nth-child(5) {
+  background: rgba(164, 199, 181, 0.08);
+}
+
+.contact-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 2.7rem;
+  height: 2.7rem;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: rgba(233, 130, 114, 0.12);
+  color: var(--color-coral);
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.contact-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.16rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.contact-copy strong {
+  font-size: 0.98rem;
+  letter-spacing: -0.01em;
+}
+
+.contact-copy small {
+  color: var(--color-text-soft);
+  font-size: 0.76rem;
+  line-height: 1.3;
+}
+
+.contact-detail {
+  color: var(--color-taupe);
+  font-size: 0.7rem;
+  letter-spacing: 0.02em;
+  text-align: right;
 }
 
 .site-footer {
@@ -673,6 +742,7 @@ nav {
   font-weight: 800;
   letter-spacing: -0.02em;
   transition: transform var(--transition-fast) ease, box-shadow var(--transition-fast) ease;
+  pointer-events: auto;
 }
 
 .floating-whatsapp:hover,
@@ -732,6 +802,44 @@ nav {
   }
 }
 
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  inset: auto;
+  pointer-events: none;
+  border-radius: 50%;
+  z-index: 0;
+  opacity: 0.18;
+  background: radial-gradient(circle, rgba(164, 199, 181, 0.35) 0%, rgba(164, 199, 181, 0.08) 45%, transparent 75%);
+  animation: driftSoft 18s ease-in-out infinite alternate;
+}
+
+body::before {
+  width: 24rem;
+  height: 24rem;
+  left: -5rem;
+  top: 12rem;
+}
+
+body::after {
+  width: 20rem;
+  height: 20rem;
+  right: -4rem;
+  bottom: 8rem;
+  background: radial-gradient(circle, rgba(233, 130, 114, 0.28) 0%, rgba(233, 130, 114, 0.08) 42%, transparent 72%);
+  animation-delay: 1.5s;
+}
+
+@keyframes driftSoft {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  100% {
+    transform: translate3d(20px, -15px, 0) scale(1.08);
+  }
+}
+
 @media (max-width: 980px) {
   .hero {
     grid-template-columns: 1fr;
@@ -755,7 +863,8 @@ nav {
   }
 
   .service-grid,
-  .steps-grid {
+  .steps-grid,
+  .contact-options {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -805,7 +914,8 @@ nav {
   }
 
   .service-grid,
-  .steps-grid {
+  .steps-grid,
+  .contact-options {
     grid-template-columns: 1fr;
   }
 
@@ -853,18 +963,14 @@ nav {
     min-height: 18rem;
   }
 
+  .contact-option {
+    align-items: flex-start;
+  }
+
   .floating-whatsapp {
     width: 3.15rem;
     height: 3.15rem;
     font-size: 0.66rem;
-  }
-
-  .contact-links {
-    flex-direction: column;
-  }
-
-  .contact-link {
-    width: 100%;
   }
 }
 
@@ -886,5 +992,11 @@ nav {
   [data-reveal] {
     opacity: 1 !important;
     transform: none !important;
+  }
+
+  body::before,
+  body::after {
+    animation: none !important;
+    opacity: 0.04 !important;
   }
 }
