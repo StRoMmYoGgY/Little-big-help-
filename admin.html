@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Marketing Dashboard | Little Big Help Admin</title>
+  <link rel="icon" type="image/png" href="/assets/images/interlocking-relief-social-tile.png" />
+  <link rel="stylesheet" href="/admin.css" />
+</head>
+<body class="admin-body">
+  <!-- Auth Barrier Screen -->
+  <div id="auth-screen" class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-header">
+        <img src="/assets/images/interlocking-relief-social-tile.png" alt="Little Big Help" class="auth-logo" />
+        <h1 class="auth-title">Little Big Help</h1>
+        <p class="auth-subtitle">AI Marketing & Social Publishing Dashboard</p>
+        <span class="auth-badge">Private Administrator Area</span>
+      </div>
+
+      <form id="login-form" class="auth-form">
+        <div id="login-error" class="alert alert-danger hidden" role="alert"></div>
+        
+        <div class="form-group">
+          <label for="admin-email">Administrator Email</label>
+          <input
+            type="email"
+            id="admin-email"
+            class="form-control"
+            value="orghosimsung@gmail.com"
+            required
+            placeholder="orghosimsung@gmail.com"
+          />
+          <small class="form-hint">Authorized access for orghosimsung@gmail.com only.</small>
+        </div>
+
+        <div class="form-group">
+          <label for="admin-passcode">Admin Access Passcode</label>
+          <input
+            type="password"
+            id="admin-passcode"
+            class="form-control"
+            required
+            placeholder="Enter administrator passcode"
+            autocomplete="current-password"
+          />
+          <small class="form-hint">Authorized access only. Protected by server-side authentication.</small>
+        </div>
+
+        <button type="submit" id="btn-login" class="btn btn-primary btn-block">
+          <span class="btn-text">Sign In to Dashboard</span>
+          <span class="spinner hidden" id="login-spinner"></span>
+        </button>
+
+        <div class="auth-footer">
+          <a href="/" class="auth-back-link">← Return to Public Website</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Main Admin Application Container -->
+  <div id="admin-app" class="admin-layout hidden">
+    <!-- Sidebar Navigation -->
+    <aside class="admin-sidebar">
+      <div class="sidebar-brand">
+        <img src="/assets/images/interlocking-relief-social-tile.png" alt="Logo" class="sidebar-logo" />
+        <div class="sidebar-brand-text">
+          <span class="brand-name">Little Big Help</span>
+          <span class="brand-tagline">Marketing Engine</span>
+        </div>
+      </div>
+
+      <div class="sidebar-admin-user">
+        <div class="user-avatar">O</div>
+        <div class="user-info">
+          <div class="user-name">Orgho (Admin)</div>
+          <div class="user-email" id="sidebar-user-email">orghosimsung@gmail.com</div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="nav-btn active" data-tab="tab-overview">
+          <span class="nav-icon">📊</span>
+          <span class="nav-label">Overview</span>
+        </button>
+        <button class="nav-btn" data-tab="tab-create">
+          <span class="nav-icon">✨</span>
+          <span class="nav-label">AI Campaign Creator</span>
+        </button>
+        <button class="nav-btn" data-tab="tab-campaigns">
+          <span class="nav-icon">📁</span>
+          <span class="nav-label">Campaigns & Drafts</span>
+          <span class="badge badge-count" id="badge-total-campaigns">0</span>
+        </button>
+        <button class="nav-btn" data-tab="tab-editor">
+          <span class="nav-icon">✏️</span>
+          <span class="nav-label">Editor & Approval</span>
+        </button>
+        <button class="nav-btn" data-tab="tab-social-accounts">
+          <span class="nav-icon">🔗</span>
+          <span class="nav-label">Social Accounts</span>
+          <span class="connection-status-dot offline" id="nav-meta-dot" title="Meta Connection"></span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="timezone-chip">
+          <span class="tz-dot"></span>
+          <span>Asia/Dhaka (BST, UTC+6)</span>
+        </div>
+        <div class="sidebar-actions">
+          <a href="/" target="_blank" class="btn btn-outline-light btn-sm" title="View live public site">View Public Site ↗</a>
+          <button id="btn-logout" class="btn btn-ghost-danger btn-sm" title="Sign out">Log Out</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="admin-main">
+      <!-- Top Bar -->
+      <header class="admin-topbar">
+        <div class="topbar-left">
+          <h2 class="topbar-title" id="page-title">Marketing Overview</h2>
+          <span class="topbar-breadcrumb" id="page-breadcrumb">Dashboard / Overview</span>
+        </div>
+        <div class="topbar-right">
+          <div class="system-chip" id="topbar-meta-status">
+            <span class="status-indicator warning"></span>
+            <span id="topbar-meta-text">Meta: Checking...</span>
+          </div>
+          <button class="btn btn-primary btn-sm" id="btn-quick-create">
+            <span>+ New AI Campaign</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Alert Notice Banner -->
+      <div id="global-alert-container" class="alert-container"></div>
+
+      <!-- Tab 1: Overview -->
+      <section id="tab-overview" class="tab-pane active">
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-coral">📝</div>
+            <div class="stat-details">
+              <span class="stat-label">Drafts</span>
+              <span class="stat-value" id="stat-drafts">0</span>
+            </div>
+            <div class="stat-footnote">Needs review & editing</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-amber">🛡️</div>
+            <div class="stat-details">
+              <span class="stat-label">Approved</span>
+              <span class="stat-value" id="stat-approved">0</span>
+            </div>
+            <div class="stat-footnote">Ready for publish / schedule</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-blue">⏰</div>
+            <div class="stat-details">
+              <span class="stat-label">Scheduled</span>
+              <span class="stat-value" id="stat-scheduled">0</span>
+            </div>
+            <div class="stat-footnote">Queued for automated post</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-sage">🚀</div>
+            <div class="stat-details">
+              <span class="stat-label">Published</span>
+              <span class="stat-value" id="stat-published">0</span>
+            </div>
+            <div class="stat-footnote">Live on Meta pages</div>
+          </div>
+        </div>
+
+        <!-- Workflow Banner -->
+        <div class="workflow-guide-card">
+          <div class="workflow-header">
+            <h3>Strict Approval Workflow Protocol</h3>
+            <span class="workflow-badge">Zero Accidental Posts</span>
+          </div>
+          <div class="workflow-steps">
+            <div class="step-pill active">
+              <span class="step-num">1</span>
+              <span class="step-txt">Create AI Copy</span>
+            </div>
+            <span class="step-arrow">→</span>
+            <div class="step-pill">
+              <span class="step-num">2</span>
+              <span class="step-txt">Generate Graphic</span>
+            </div>
+            <span class="step-arrow">→</span>
+            <div class="step-pill">
+              <span class="step-num">3</span>
+              <span class="step-txt">Social Preview</span>
+            </div>
+            <span class="step-arrow">→</span>
+            <div class="step-pill">
+              <span class="step-num">4</span>
+              <span class="step-txt">Save Draft</span>
+            </div>
+            <span class="step-arrow">→</span>
+            <div class="step-pill step-pill-gate">
+              <span class="step-num">5</span>
+              <span class="step-txt">Explicit Approval</span>
+            </div>
+            <span class="step-arrow">→</span>
+            <div class="step-pill step-pill-final">
+              <span class="step-num">6</span>
+              <span class="step-txt">Publish / Schedule</span>
+            </div>
+          </div>
+          <p class="workflow-note">
+            Posts cannot be published or scheduled without an explicit administrator review and approval.
+          </p>
+        </div>
+
+        <!-- Recent Campaigns Table -->
+        <div class="content-card">
+          <div class="content-card-header">
+            <h3>Recent Campaigns</h3>
+            <button class="btn btn-outline btn-sm" id="btn-refresh-overview">↻ Refresh</button>
+          </div>
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Campaign Title</th>
+                  <th>Service Category</th>
+                  <th>Platforms</th>
+                  <th>Status</th>
+                  <th>Approval</th>
+                  <th>Scheduled / Published</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="overview-campaigns-tbody">
+                <tr>
+                  <td colspan="7" class="text-center py-4 text-muted">Loading campaigns...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab 2: AI Campaign Creator -->
+      <section id="tab-create" class="tab-pane">
+        <div class="creator-container">
+          <!-- Input Form Column -->
+          <div class="content-card creator-form-card">
+            <div class="content-card-header">
+              <div>
+                <h3>✨ AI Campaign Generator</h3>
+                <p class="section-desc">Generate high-converting, localized marketing copy tailored for Sylhet & Little Big Help services.</p>
+              </div>
+            </div>
+
+            <form id="ai-generator-form">
+              <div class="form-group">
+                <label for="ai-service-category">Target Service Category</label>
+                <select id="ai-service-category" class="form-control" required>
+                  <option value="Everyday Help">Everyday Help (Errands, Shopping, Household tasks)</option>
+                  <option value="Local Assistance" selected>Local Assistance in Sylhet (Appointments, Airport, Guidance)</option>
+                  <option value="Business Support">Business Support (Supplies, Admin tasks, Local coordination)</option>
+                  <option value="Website Design & Development">Website Design & Development (Websites for local businesses)</option>
+                  <option value="Custom Requests">Custom Requests (Tailored personal / business assistance)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="ai-custom-topic">Specific Promotional Angle or Offer</label>
+                <input
+                  type="text"
+                  id="ai-custom-topic"
+                  class="form-control"
+                  placeholder="e.g. Taking care of parents in Sylhet while living abroad / Rapid grocery delivery"
+                  value="Peace of mind for busy families and expatriates needing reliable hands in Sylhet"
+                />
+              </div>
+
+              <div class="form-row">
+                <div class="form-group col-6">
+                  <label for="ai-target-audience">Target Audience</label>
+                  <select id="ai-target-audience" class="form-control">
+                    <option value="Sylhet Residents & Expatriate Families" selected>Sylhet Residents & Expatriates</option>
+                    <option value="Busy Working Professionals">Busy Working Professionals</option>
+                    <option value="Local Business Owners & Shops">Local Business Owners & Shops</option>
+                    <option value="Elderly Family Support">Elderly Family Support</option>
+                  </select>
+                </div>
+
+                <div class="form-group col-6">
+                  <label for="ai-promotional-goal">Marketing Goal</label>
+                  <select id="ai-promotional-goal" class="form-control">
+                    <option value="WhatsApp Inquiries" selected>Direct WhatsApp Chats & Inquiries</option>
+                    <option value="Brand Awareness">Brand Trust & Awareness</option>
+                    <option value="Limited Time Offer">Limited Time Discount / Promo</option>
+                    <option value="Customer Testimonial Story">Service Highlight & Reliability</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group col-6">
+                  <label for="ai-tone">Tone of Voice</label>
+                  <select id="ai-tone" class="form-control">
+                    <option value="Friendly, Trustworthy, and Reassuring" selected>Friendly, Trustworthy & Warm</option>
+                    <option value="Professional & Business-Focused">Professional & Crisp</option>
+                    <option value="Urgent & Action-Oriented">Urgent & Direct Problem-Solving</option>
+                    <option value="Festive & Seasonal">Seasonal / Holiday Care</option>
+                  </select>
+                </div>
+
+                <div class="form-group col-6">
+                  <label for="ai-language">Language & Style</label>
+                  <select id="ai-language" class="form-control">
+                    <option value="English with Sylhet touchpoints" selected>English with Sylhet touchpoints</option>
+                    <option value="Bilingual English + Bengali">Bilingual (English + Bengali summary)</option>
+                    <option value="Crisp English only">Crisp Professional English</option>
+                  </select>
+                </div>
+              </div>
+
+              <button type="submit" id="btn-generate-ai" class="btn btn-primary btn-block btn-lg">
+                <span class="btn-text">🚀 Generate 3 AI Campaign Angles</span>
+                <span class="spinner hidden" id="generate-spinner"></span>
+              </button>
+            </form>
+          </div>
+
+          <!-- AI Output Variations Column -->
+          <div class="content-card creator-results-card">
+            <div class="content-card-header">
+              <h3>Generated Variations</h3>
+              <span class="text-muted text-sm" id="results-count-text">Ready to generate</span>
+            </div>
+
+            <div id="ai-results-placeholder" class="empty-state">
+              <div class="empty-icon">💡</div>
+              <h4>No Variations Generated Yet</h4>
+              <p>Configure your target service and promotional angle on the left, then click <strong>Generate</strong> to let Gemini craft 3 tailored campaign concepts.</p>
+            </div>
+
+            <div id="ai-results-list" class="variations-list hidden">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab 3: Campaigns & Drafts List -->
+      <section id="tab-campaigns" class="tab-pane">
+        <div class="content-card">
+          <div class="content-card-header">
+            <div>
+              <h3>All Campaigns & Drafts</h3>
+              <p class="section-desc">Manage your marketing pipeline across all stages.</p>
+            </div>
+            <div class="filter-actions">
+              <select id="campaign-filter-status" class="form-control form-control-sm">
+                <option value="all">All Statuses</option>
+                <option value="draft">Drafts Only</option>
+                <option value="approved">Approved Only</option>
+                <option value="scheduled">Scheduled Only</option>
+                <option value="published">Published Only</option>
+              </select>
+              <button class="btn btn-outline btn-sm" id="btn-refresh-campaigns">↻ Refresh</button>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Preview</th>
+                  <th>Title & Service</th>
+                  <th>Platforms</th>
+                  <th>Approval Status</th>
+                  <th>Current State</th>
+                  <th>Last Updated</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="campaigns-list-tbody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab 4: Editor, Graphic Generator & Approval Gate -->
+      <section id="tab-editor" class="tab-pane">
+        <!-- Editor Top Action Bar -->
+        <div class="editor-header-bar">
+          <div class="editor-title-group">
+            <input
+              type="text"
+              id="editor-campaign-title"
+              class="campaign-title-input"
+              value="Untitled Campaign"
+              placeholder="Enter Campaign Title..."
+            />
+            <div class="campaign-meta-chips">
+              <span class="badge" id="editor-status-badge">Status: Draft</span>
+              <span class="badge" id="editor-approval-badge">Unapproved</span>
+              <span class="badge badge-outline" id="editor-id-badge">ID: --</span>
+            </div>
+          </div>
+
+          <div class="editor-actions-group">
+            <button id="btn-save-draft" class="btn btn-outline">
+              💾 Save Draft
+            </button>
+            
+            <button id="btn-toggle-approval" class="btn btn-warning">
+              🛡️ Approve Campaign
+            </button>
+
+            <button id="btn-open-schedule-modal" class="btn btn-secondary" disabled>
+              ⏰ Schedule...
+            </button>
+
+            <button id="btn-open-publish-modal" class="btn btn-success" disabled>
+              🚀 Publish Now
+            </button>
+          </div>
+        </div>
+
+        <!-- Two Column Editor Workspace -->
+        <div class="editor-workspace">
+          <!-- Left Column: Copy & Graphic Controls -->
+          <div class="editor-controls-col">
+            <!-- Accordion 1: Social Copy -->
+            <div class="content-card">
+              <div class="content-card-header">
+                <h4>📝 Social Copy & Captions</h4>
+                <span class="text-xs text-muted">Formatted for Meta Feeds</span>
+              </div>
+
+              <div class="form-group">
+                <label for="editor-headline">Headline (Visual Hook)</label>
+                <input type="text" id="editor-headline" class="form-control" placeholder="Short punchy headline" />
+              </div>
+
+              <div class="form-group">
+                <label for="editor-hook">Hook (First 1-2 Sentences)</label>
+                <textarea id="editor-hook" class="form-control" rows="2" placeholder="Scroll-stopping opening line"></textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="editor-body">Body Copy</label>
+                <textarea id="editor-body" class="form-control" rows="6" placeholder="Main description, features, bullet points"></textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="editor-cta">Call to Action (CTA)</label>
+                <input type="text" id="editor-cta" class="form-control" placeholder="e.g. Chat with us on WhatsApp: +880 1865-383565" />
+              </div>
+
+              <div class="form-group">
+                <label for="editor-hashtags">Hashtags (Comma or space separated)</label>
+                <input type="text" id="editor-hashtags" class="form-control" placeholder="#Sylhet #LittleBigHelp #SylhetServices" />
+              </div>
+
+              <div class="form-row">
+                <div class="form-group col-6">
+                  <label for="editor-service-category">Service Category</label>
+                  <select id="editor-service-category" class="form-control">
+                    <option value="Everyday Help">Everyday Help</option>
+                    <option value="Local Assistance">Local Assistance</option>
+                    <option value="Business Support">Business Support</option>
+                    <option value="Website Design & Development">Website Design & Development</option>
+                    <option value="Custom Requests">Custom Requests</option>
+                  </select>
+                </div>
+
+                <div class="form-group col-6">
+                  <label>Target Platforms</label>
+                  <div class="checkbox-group">
+                    <label class="checkbox-label">
+                      <input type="checkbox" id="plat-facebook" checked /> Facebook Page
+                    </label>
+                    <label class="checkbox-label">
+                      <input type="checkbox" id="plat-instagram" checked /> Instagram
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Accordion 2: Graphic Banner Generator -->
+            <div class="content-card">
+              <div class="content-card-header">
+                <h4>🎨 Graphic Banner Generator</h4>
+                <span class="badge badge-accent">Auto-Render Canvas</span>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group col-6">
+                  <label for="editor-aspect-ratio">Aspect Ratio</label>
+                  <select id="editor-aspect-ratio" class="form-control">
+                    <option value="1:1" selected>1:1 Square (1080 × 1080) - FB & IG Feed</option>
+                    <option value="4:5">4:5 Portrait (1080 × 1350) - IG Feed</option>
+                    <option value="9:16">9:16 Story / Reel (1080 × 1920)</option>
+                  </select>
+                </div>
+
+                <div class="form-group col-6">
+                  <label for="editor-graphic-badge">Badge Label</label>
+                  <input type="text" id="editor-graphic-badge" class="form-control" value="Verified Local Service" />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group col-6">
+                  <label for="editor-graphic-headline">Graphic Headline</label>
+                  <input type="text" id="editor-graphic-headline" class="form-control" value="Your Reliable Hands in Sylhet" />
+                </div>
+
+                <div class="form-group col-6">
+                  <label for="editor-graphic-subhead">Graphic Subhead / Services</label>
+                  <input type="text" id="editor-graphic-subhead" class="form-control" value="Errands • Pickups • Local Support" />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group col-4">
+                  <label for="editor-graphic-accent">Accent Color</label>
+                  <div class="color-picker-wrapper">
+                    <input type="color" id="editor-graphic-accent" value="#F26A5A" />
+                    <span class="color-hex">#F26A5A</span>
+                  </div>
+                </div>
+
+                <div class="form-group col-4">
+                  <label for="editor-graphic-bg">Background</label>
+                  <div class="color-picker-wrapper">
+                    <input type="color" id="editor-graphic-bg" value="#2C3E50" />
+                    <span class="color-hex">#2C3E50</span>
+                  </div>
+                </div>
+
+                <div class="form-group col-4">
+                  <label for="editor-graphic-theme">Theme Preset</label>
+                  <select id="editor-graphic-theme" class="form-control">
+                    <option value="coral_slate" selected>Coral & Slate</option>
+                    <option value="sage_forest">Sage & Forest</option>
+                    <option value="cream_coral">Cream & Coral</option>
+                    <option value="modern_dark">Tech Dark / Web</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Replace with Custom Uploaded Image (Optional)</label>
+                <div class="custom-file-row">
+                  <input type="file" id="editor-image-upload" accept="image/*" class="form-control" />
+                  <button type="button" id="btn-clear-custom-image" class="btn btn-outline btn-sm hidden">Remove Custom Image</button>
+                </div>
+              </div>
+
+              <div class="graphic-export-actions">
+                <button type="button" id="btn-download-graphic" class="btn btn-outline btn-sm">
+                  📥 Download Generated Image (PNG)
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Live Mockup Previews -->
+          <div class="editor-preview-col">
+            <div class="preview-card-sticky">
+              <div class="preview-toggle-bar">
+                <span class="preview-bar-title">📱 Live Feed Preview</span>
+                <div class="preview-tabs">
+                  <button class="preview-tab active" data-preview="facebook">
+                    <img src="assets/images/logo-facebook.svg" width="16" height="16" alt="FB" /> Facebook
+                  </button>
+                  <button class="preview-tab" data-preview="instagram">
+                    <img src="assets/images/logo-instagram.svg" width="16" height="16" alt="IG" /> Instagram
+                  </button>
+                </div>
+              </div>
+
+              <!-- Facebook Preview Mockup -->
+              <div id="preview-facebook" class="preview-shell active">
+                <div class="fb-post-mockup">
+                  <!-- Header -->
+                  <div class="fb-post-header">
+                    <img src="assets/images/interlocking-relief-social-tile.png" alt="Little Big Help" class="fb-avatar" />
+                    <div class="fb-author-info">
+                      <div class="fb-page-name">Little Big Help <span class="fb-verified">✓</span></div>
+                      <div class="fb-post-time">Just now · 🌍 Public</div>
+                    </div>
+                    <div class="fb-more-dots">•••</div>
+                  </div>
+
+                  <!-- Text Caption -->
+                  <div class="fb-post-caption" id="fb-preview-text">
+                    Loading preview text...
+                  </div>
+
+                  <!-- Graphic Canvas -->
+                  <div class="fb-post-media">
+                    <canvas id="banner-canvas" width="1080" height="1080" class="preview-canvas"></canvas>
+                  </div>
+
+                  <!-- Engagement Footer -->
+                  <div class="fb-post-footer">
+                    <div class="fb-reaction-bar">
+                      <span>👍❤️ 42</span>
+                      <span>8 comments · 4 shares</span>
+                    </div>
+                    <div class="fb-action-buttons">
+                      <button type="button" class="fb-btn">Like</button>
+                      <button type="button" class="fb-btn">Comment</button>
+                      <button type="button" class="fb-btn">Share</button>
+                      <a href="https://wa.me/8801865383565" target="_blank" class="fb-whatsapp-chip">Send WhatsApp Message</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Instagram Preview Mockup -->
+              <div id="preview-instagram" class="preview-shell">
+                <div class="ig-post-mockup">
+                  <!-- Header -->
+                  <div class="ig-post-header">
+                    <div class="ig-avatar-ring">
+                      <img src="assets/images/interlocking-relief-social-tile.png" alt="Little Big Help" class="ig-avatar" />
+                    </div>
+                    <div class="ig-author-info">
+                      <div class="ig-username">littlebighelp28</div>
+                      <div class="ig-location">Sylhet, Bangladesh</div>
+                    </div>
+                    <div class="ig-more-dots">•••</div>
+                  </div>
+
+                  <!-- Graphic Media -->
+                  <div class="ig-post-media">
+                    <canvas id="banner-canvas-ig" width="1080" height="1080" class="preview-canvas"></canvas>
+                  </div>
+
+                  <!-- Actions -->
+                  <div class="ig-post-actions">
+                    <div class="ig-action-left">
+                      <span>❤️</span>
+                      <span>💬</span>
+                      <span>✈️</span>
+                    </div>
+                    <div class="ig-action-right">
+                      <span>🔖</span>
+                    </div>
+                  </div>
+
+                  <!-- Likes & Caption -->
+                  <div class="ig-post-caption-box">
+                    <div class="ig-likes-count">Liked by <strong>sylhet_community</strong> and <strong>others</strong></div>
+                    <div class="ig-caption-text">
+                      <span class="ig-bold-user">littlebighelp28</span>
+                      <span id="ig-preview-text">Caption text here...</span>
+                    </div>
+                    <div class="ig-timestamp">JUST NOW</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Approval Status Callout -->
+              <div id="preview-approval-callout" class="approval-callout pending">
+                <div class="callout-icon">⚠️</div>
+                <div class="callout-body">
+                  <strong>Approval Required</strong>
+                  <p>This campaign is currently in <em>Draft</em> mode. Publishing and scheduling are locked until you explicitly review and approve it.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab 5: Social Accounts & Meta Graph API Settings -->
+      <section id="tab-social-accounts" class="tab-pane">
+        <div class="content-card settings-card">
+          <div class="content-card-header">
+            <div>
+              <h3>🔗 Meta Graph API & Social Publishing Configuration</h3>
+              <p class="section-desc">Connect your authorized Facebook Page and Instagram Professional Account to publish directly from Little Big Help.</p>
+            </div>
+            <div id="meta-connection-badge" class="connection-pill offline">
+              <span class="dot"></span>
+              <span id="meta-connection-text">Disconnected</span>
+            </div>
+          </div>
+
+          <div class="meta-guidelines-box">
+            <h4>📋 How to Connect Your Meta Business Assets</h4>
+            <ol>
+              <li>Go to <a href="https://developers.facebook.com" target="_blank" rel="noopener">Meta for Developers</a> and create or select your Little Big Help app.</li>
+              <li>Ensure the app has the <code>pages_manage_posts</code>, <code>pages_read_engagement</code>, and <code>instagram_content_publish</code> permissions.</li>
+              <li>Generate a long-lived <strong>Page Access Token</strong> for your Facebook Page (<em>Little Big Help</em>).</li>
+              <li>Enter your Facebook Page ID and Page Access Token below, then click <strong>Test Connection</strong>.</li>
+            </ol>
+            <p class="text-sm text-muted"><em>All credentials and tokens are stored securely on the private server and are never exposed to public website visitors or client bundles.</em></p>
+          </div>
+
+          <form id="meta-settings-form">
+            <div class="form-row">
+              <div class="form-group col-6">
+                <label for="setting-fb-page-id">Facebook Page ID</label>
+                <input
+                  type="text"
+                  id="setting-fb-page-id"
+                  class="form-control"
+                  placeholder="e.g. 61595733184255"
+                />
+                <small class="form-hint">Found in your Facebook Page About/Transparency section.</small>
+              </div>
+
+              <div class="form-group col-6">
+                <label for="setting-ig-account-id">Instagram Professional Account ID</label>
+                <input
+                  type="text"
+                  id="setting-ig-account-id"
+                  class="form-control"
+                  placeholder="e.g. 17841400000000000"
+                />
+                <small class="form-hint">Linked Instagram Professional Account ID.</small>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="setting-meta-app-id">Meta App ID (Optional)</label>
+              <input
+                type="text"
+                id="setting-meta-app-id"
+                class="form-control"
+                placeholder="Meta App ID from Meta Developer Console"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="setting-page-access-token">Meta Page Access Token</label>
+              <div class="token-input-row">
+                <input
+                  type="password"
+                  id="setting-page-access-token"
+                  class="form-control"
+                  placeholder="Paste your Page Access Token (EAAB...)"
+                  autocomplete="off"
+                />
+                <button type="button" id="btn-toggle-token-mask" class="btn btn-outline btn-sm">👁️ Show</button>
+              </div>
+              <small class="form-hint" id="token-status-hint">No token currently stored.</small>
+            </div>
+
+            <div class="settings-actions">
+              <button type="submit" id="btn-save-meta-settings" class="btn btn-primary">
+                💾 Save Configuration
+              </button>
+              <button type="button" id="btn-test-meta-connection" class="btn btn-outline">
+                <span class="btn-text">⚡ Test Live Connection</span>
+                <span class="spinner hidden" id="test-conn-spinner"></span>
+              </button>
+            </div>
+          </form>
+
+          <div id="meta-test-result" class="test-result-box hidden">
+            <!-- Dynamic feedback -->
+          </div>
+        </div>
+
+        <!-- Data Persistence & Safe Backup Card (Priority 2) -->
+        <div class="content-card settings-card mt-4">
+          <div class="content-card-header">
+            <div>
+              <h3>💾 Data Persistence & Secure Backups</h3>
+              <p class="section-desc">Download complete backups of your campaigns and settings, or restore previously exported campaign libraries.</p>
+            </div>
+            <span class="connection-pill online">
+              <span class="pill-dot"></span>
+              <span>Protected Storage</span>
+            </span>
+          </div>
+
+          <div class="persistence-info-box">
+            <div class="persistence-stat">
+              <div class="p-label">Storage Architecture</div>
+              <div class="p-value">Atomic JSON Storage with Cloud Run Ephemeral Safeguards</div>
+            </div>
+            <div class="persistence-stat">
+              <div class="p-label">Public Directory Isolation</div>
+              <div class="p-value text-success">✓ <code>/data/*</code> blocked from public web visitors</div>
+            </div>
+          </div>
+
+          <div class="settings-actions mt-3">
+            <button type="button" id="btn-export-backup" class="btn btn-primary">
+              📥 Export Full JSON Backup
+            </button>
+            <input type="file" id="file-restore-backup" accept=".json" class="hidden" />
+            <button type="button" id="btn-restore-backup" class="btn btn-outline">
+              📤 Restore From Backup File
+            </button>
+          </div>
+          <small class="form-hint mt-2">Export regular JSON backups before server migrations or cloud redeployments.</small>
+        </div>
+
+        <!-- Administrator Security & Passcode Configuration -->
+        <div class="content-card settings-card mt-4">
+          <div class="content-card-header">
+            <div>
+              <h3>🔐 Administrator Security & Passcode</h3>
+              <p class="section-desc">Manage your admin access credentials for <strong>orghosimsung@gmail.com</strong>.</p>
+            </div>
+            <span class="connection-pill online">
+              <span class="pill-dot"></span>
+              <span>Owner Access</span>
+            </span>
+          </div>
+
+          <form id="passcode-change-form" class="settings-form mt-2">
+            <div id="passcode-change-alert" class="alert hidden" role="alert"></div>
+
+            <div class="form-group">
+              <label for="current-passcode-input">Current Administrator Passcode</label>
+              <input
+                type="password"
+                id="current-passcode-input"
+                class="form-control"
+                placeholder="Enter your current passcode"
+                required
+                autocomplete="current-password"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="new-passcode-input">New Administrator Passcode</label>
+              <input
+                type="password"
+                id="new-passcode-input"
+                class="form-control"
+                placeholder="Enter a new secure passcode (min 8 characters)"
+                required
+                minlength="8"
+                autocomplete="new-password"
+              />
+              <small class="form-hint">Tip: You can also define <code>ADMIN_PASSCODE</code> directly in your <code>.env</code> file or server environment.</small>
+            </div>
+
+            <div class="settings-actions">
+              <button type="submit" id="btn-update-passcode" class="btn btn-primary">
+                <span class="btn-text">🔒 Update Admin Passcode</span>
+                <span class="spinner hidden" id="passcode-spinner"></span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal: Approval Confirmation -->
+  <div id="modal-approval" class="modal-backdrop hidden">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>🛡️ Explicit Approval Required</h3>
+        <button class="modal-close" data-close-modal="modal-approval">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>You are about to approve this marketing campaign for publishing or scheduling:</p>
+        <div class="approval-summary-card">
+          <strong id="approval-modal-title">Campaign Title</strong>
+          <p class="text-sm text-muted" id="approval-modal-category">Category</p>
+          <div class="approval-checklist">
+            <div>✓ Verified accuracy of services & phone numbers (+880 1865-383565)</div>
+            <div>✓ Checked headline, body formatting & hashtags</div>
+            <div>✓ Verified graphic layout & brand visual standards</div>
+          </div>
+        </div>
+        <p class="text-xs text-muted mt-2">
+          Approving this campaign unlocks the <strong>Publish Now</strong> and <strong>Schedule</strong> controls. It will NOT publish immediately until you click Publish or confirm a schedule time.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" data-close-modal="modal-approval">Cancel</button>
+        <button id="btn-confirm-approval" class="btn btn-warning">I Approve This Campaign</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Publish Confirmation -->
+  <div id="modal-publish" class="modal-backdrop hidden">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>🚀 Confirm Immediate Publication</h3>
+        <button class="modal-close" data-close-modal="modal-publish">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>This action will immediately publish this post to your live social channels via Meta Graph API:</p>
+        <div class="publish-targets-list" id="publish-modal-targets">
+          <div class="target-item">
+            <span class="target-icon">📘</span> Facebook Page
+          </div>
+          <div class="target-item">
+            <span class="target-icon">📸</span> Instagram Professional Feed
+          </div>
+        </div>
+        <div class="alert alert-warning mt-3">
+          <strong>Important:</strong> Live publishing cannot be automatically undone. Ensure your Page Access Token is active.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" data-close-modal="modal-publish">Cancel</button>
+        <button id="btn-confirm-publish" class="btn btn-success">
+          <span class="btn-text">Yes, Publish to Meta Now</span>
+          <span class="spinner hidden" id="publish-spinner"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Schedule Post -->
+  <div id="modal-schedule" class="modal-backdrop hidden">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>⏰ Schedule Campaign Publication</h3>
+        <button class="modal-close" data-close-modal="modal-schedule">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Select when you want this approved campaign to be published (Bangladesh Standard Time, UTC+6):</p>
+        <div class="form-group">
+          <label for="schedule-datetime">Publication Date & Time (BST)</label>
+          <input type="datetime-local" id="schedule-datetime" class="form-control" required />
+          <small class="form-hint">Timezone: Asia/Dhaka (Sylhet, Bangladesh)</small>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" data-close-modal="modal-schedule">Cancel</button>
+        <button id="btn-confirm-schedule" class="btn btn-primary">Schedule Campaign</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Application Logic -->
+  <script type="module" src="/admin.js"></script>
+</body>
+</html>

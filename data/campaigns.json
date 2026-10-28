@@ -1,0 +1,88 @@
+[
+  {
+    "createdAt": "2026-10-27T04:29:53.259Z",
+    "headline": "Give Your Business a Professional Website",
+    "serviceCategory": "Website Design & Development",
+    "hashtags": [
+      "#WebsiteDesignSylhet",
+      "#LittleBigHelp",
+      "#WebDevelopment",
+      "#SylhetBusiness",
+      "#GrowOnline"
+    ],
+    "aspectRatio": "1:1",
+    "callToAction": "Chat on WhatsApp: +880 1865-383565 to discuss your website project.",
+    "metaPublishResult": null,
+    "id": "camp-web-dev",
+    "bodyCopy": "Little Big Help now builds clean, modern, and lightning-fast websites tailored for Sylhet businesses and service providers.\n\n• Mobile-optimized and responsive\n• Direct WhatsApp chat integration for instant customer inquiries\n• Fast delivery with transparent pricing\n• Optional monthly maintenance & updates\n\nLet's build a website you are proud to share.",
+    "status": "draft",
+    "platforms": [
+      "facebook",
+      "instagram"
+    ],
+    "goal": "Lead Generation",
+    "approval": {
+      "approvedAt": null,
+      "approved": false,
+      "approvedBy": null
+    },
+    "targetAudience": "Local Shop Owners, Doctors, Consultants & Entrepreneurs",
+    "hook": "Stop losing customers to outdated pages or broken contact forms.",
+    "publishedAt": null,
+    "title": "New Service: Website Design for Small Businesses",
+    "graphicData": {
+      "bannerType": "web_launch",
+      "textColor": "#FFFFFF",
+      "bgColor": "#1E293B",
+      "badgeText": "New Service Launch",
+      "subhead": "Built fast. Designed for results. Easy maintenance.",
+      "accentColor": "#28A745",
+      "headline": "Modern Websites for Sylhet Businesses"
+    },
+    "scheduledFor": null,
+    "updatedAt": "2026-10-27T04:29:53.259Z"
+  },
+  {
+    "status": "draft",
+    "targetAudience": "Sylhet Residents & Expatriate Families",
+    "title": "Sylhet Local Errands & Assistance Campaign",
+    "graphicData": {
+      "badgeText": "Verified Local Service",
+      "subhead": "Errands • Pickups • Local Support",
+      "textColor": "#FFFFFF",
+      "bgColor": "#2C3E50",
+      "bannerType": "services_highlight",
+      "headline": "Your Reliable Hands in Sylhet",
+      "accentColor": "#F26A5A"
+    },
+    "id": "camp-welcome-sylhet",
+    "publishedAt": null,
+    "updatedAt": "2026-10-27T04:30:38.809Z",
+    "hook": "From hospital visits to grocery pickups and bill payments, we have got you covered.",
+    "callToAction": "Message us on WhatsApp to discuss your task today!",
+    "approval": {
+      "approvedBy": null,
+      "approved": false,
+      "approvedAt": null
+    },
+    "createdAt": "2026-10-27T04:29:53.259Z",
+    "scheduledFor": null,
+    "bodyCopy": "Life gets busy, but you don't have to handle everything alone. Little Big Help provides trustworthy, verified local hands right across Sylhet. Whether you are living locally or taking care of family from abroad, tell us what you need.\n\n✓ Transparent pricing\n✓ Real-time task updates on WhatsApp\n✓ Fast and dependable assistance",
+    "goal": "Brand Awareness & WhatsApp Inquiries",
+    "hashtags": [
+      "#Sylhet",
+      "#LittleBigHelp",
+      "#SylhetServices",
+      "#LocalHelp",
+      "#SmallTasksBigRelief"
+    ],
+    "headline": "Need something taken care of in Sylhet?",
+    "metaPublishResult": null,
+    "platforms": [
+      "facebook",
+      "instagram"
+    ],
+    "serviceCategory": "Local Assistance",
+    "aspectRatio": "1:1"
+  }
+]

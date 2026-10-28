@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="robots" content="noindex, nofollow, noarchive" />
+  <title>Admin Login | Little Big Help</title>
+  <link rel="icon" type="image/png" href="/assets/images/interlocking-relief-social-tile.png" />
+  <link rel="stylesheet" href="/admin.css" />
+  <style>
+    /* Dedicated Auth Page Enhancements */
+    body.auth-page {
+      background: linear-gradient(135deg, #FAF7F2 0%, #F5EDE4 50%, #E8EFEA 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #1E293B;
+    }
+
+    .auth-container {
+      width: 100%;
+      max-width: 440px;
+      margin: 0 auto;
+    }
+
+    .auth-card {
+      background: #FFFFFF;
+      border-radius: 18px;
+      padding: 36px 30px;
+      box-shadow: 0 12px 36px rgba(44, 62, 80, 0.12), 0 2px 6px rgba(0, 0, 0, 0.04);
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .auth-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, #F26A5A 0%, #E05545 40%, #6A8E7F 100%);
+    }
+
+    .auth-branding {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .auth-logo-img {
+      width: 72px;
+      height: 72px;
+      border-radius: 16px;
+      box-shadow: 0 6px 16px rgba(242, 106, 90, 0.25);
+      object-fit: cover;
+      margin-bottom: 12px;
+    }
+
+    .auth-brand-name {
+      font-size: 24px;
+      font-weight: 800;
+      color: #2C3E50;
+      letter-spacing: -0.5px;
+      margin: 0;
+    }
+
+    .auth-tagline {
+      font-size: 13px;
+      color: #64748B;
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    .auth-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #FEF3C7;
+      color: #92400E;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 10px;
+      border: 1px solid #FDE68A;
+    }
+
+    .auth-pill-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #D97706;
+    }
+
+    .auth-form-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1E293B;
+      margin-bottom: 6px;
+    }
+
+    .auth-form-desc {
+      font-size: 12px;
+      color: #64748B;
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: #334155;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .form-control-custom {
+      width: 100%;
+      height: 48px;
+      padding: 10px 14px;
+      font-size: 14px;
+      color: #1E293B;
+      background: #F8FAFC;
+      border: 1.5px solid #CBD5E1;
+      border-radius: 10px;
+      box-sizing: border-box;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .form-control-custom:focus {
+      outline: none;
+      background: #FFFFFF;
+      border-color: #F26A5A;
+      box-shadow: 0 0 0 3px rgba(242, 106, 90, 0.15);
+    }
+
+    .toggle-pwd-btn {
+      position: absolute;
+      right: 10px;
+      background: none;
+      border: none;
+      color: #64748B;
+      cursor: pointer;
+      padding: 6px 8px;
+      font-size: 14px;
+      border-radius: 6px;
+      transition: color 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .toggle-pwd-btn:hover {
+      color: #1E293B;
+    }
+
+    .form-note {
+      font-size: 11px;
+      color: #64748B;
+      margin-top: 5px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-submit-auth {
+      width: 100%;
+      height: 48px;
+      background: #F26A5A;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(242, 106, 90, 0.3);
+      margin-top: 24px;
+    }
+
+    .btn-submit-auth:hover:not(:disabled) {
+      background: #E05545;
+      box-shadow: 0 6px 16px rgba(242, 106, 90, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .btn-submit-auth:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .btn-submit-auth:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .auth-alert-box {
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 12px;
+      line-height: 1.4;
+      margin-bottom: 18px;
+      display: none;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .auth-alert-box.error {
+      display: block;
+      background: #FEE2E2;
+      border: 1px solid #FCA5A5;
+      color: #991B1B;
+    }
+
+    .auth-alert-box.success {
+      display: block;
+      background: #DEF7EC;
+      border: 1px solid #84E1BC;
+      color: #03543F;
+    }
+
+    .security-guarantees {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid #F1F5F9;
+      text-align: left;
+    }
+
+    .guarantee-item {
+      font-size: 11px;
+      color: #64748B;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .guarantee-icon {
+      color: #10B981;
+      font-weight: bold;
+    }
+
+    .back-home {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .back-home a {
+      color: #64748B;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 500;
+      transition: color 0.15s;
+    }
+
+    .back-home a:hover {
+      color: #F26A5A;
+      text-decoration: underline;
+    }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      border-top-color: #FFFFFF;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: inline-block;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 480px) {
+      .auth-card {
+        padding: 28px 20px;
+        border-radius: 14px;
+      }
+      .auth-brand-name {
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+<body class="auth-page">
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-branding">
+        <img
+          src="/assets/images/interlocking-relief-social-tile.png"
+          alt="Little Big Help"
+          class="auth-logo-img"
+          width="72"
+          height="72"
+        />
+        <h1 class="auth-brand-name">Little Big Help</h1>
+        <p class="auth-tagline">Small Tasks, Big Relief • Sylhet, Bangladesh</p>
+        <div class="auth-pill">
+          <span class="auth-pill-dot"></span>
+          <span>Administrator Access</span>
+        </div>
+      </div>
+
+      <div class="auth-form-title">Sign in to Marketing Workspace</div>
+      <div class="auth-form-desc">
+        Authorized portal for AI campaign generation, visual banner studio, scheduling, and Meta social publishing.
+      </div>
+
+      <div id="auth-alert" class="auth-alert-box" role="alert"></div>
+
+      <form id="admin-login-form" method="POST" action="/api/auth/login" novalidate>
+        <div class="form-group">
+          <label for="admin-email">Administrator Email</label>
+          <div class="input-wrapper">
+            <input
+              type="email"
+              id="admin-email"
+              name="email"
+              class="form-control-custom"
+              value="orghosimsung@gmail.com"
+              required
+              autocomplete="username"
+              placeholder="orghosimsung@gmail.com"
+              spellcheck="false"
+            />
+          </div>
+          <div class="form-note">
+            <span>🔒</span> Restricted to designated administrator account: <strong>orghosimsung@gmail.com</strong> (or <strong>orghosung@gmail.com</strong>)
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="admin-passcode">Admin Access Passcode</label>
+          <div class="input-wrapper">
+            <input
+              type="password"
+              id="admin-passcode"
+              name="passcode"
+              class="form-control-custom"
+              required
+              autocomplete="current-password"
+              placeholder="Enter administrator passcode"
+              style="padding-right: 42px;"
+            />
+            <button type="button" id="toggle-passcode" class="toggle-pwd-btn" aria-label="Toggle passcode visibility">
+              👁️
+            </button>
+          </div>
+          <div class="form-note">
+            <span>🛡️</span> Verified securely server-side against <code>ADMIN_PASSCODE</code>
+          </div>
+        </div>
+
+        <button type="submit" id="btn-submit" class="btn-submit-auth">
+          <span id="btn-text">Sign In to Dashboard</span>
+          <span id="btn-spinner" class="spinner" style="display: none;"></span>
+        </button>
+      </form>
+
+      <div class="security-guarantees">
+        <div class="guarantee-item">
+          <span class="guarantee-icon">✓</span>
+          <span>Timing-safe server validation (anti-timing attacks)</span>
+        </div>
+        <div class="guarantee-item">
+          <span class="guarantee-icon">✓</span>
+          <span>Secure HttpOnly & SameSite session cookie authorization</span>
+        </div>
+        <div class="guarantee-item">
+          <span class="guarantee-icon">✓</span>
+          <span>Brute-force lockout protection with IP rate limiting</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="back-home">
+      <a href="/">← Return to Little Big Help Homepage</a>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const form = document.getElementById('admin-login-form');
+      const emailInput = document.getElementById('admin-email');
+      const passcodeInput = document.getElementById('admin-passcode');
+      const btnSubmit = document.getElementById('btn-submit');
+      const btnText = document.getElementById('btn-text');
+      const btnSpinner = document.getElementById('btn-spinner');
+      const alertBox = document.getElementById('auth-alert');
+      const toggleBtn = document.getElementById('toggle-passcode');
+
+      // Password visibility toggle
+      toggleBtn.addEventListener('click', function() {
+        const isPassword = passcodeInput.getAttribute('type') === 'password';
+        passcodeInput.setAttribute('type', isPassword ? 'text' : 'password');
+        toggleBtn.textContent = isPassword ? '🙈' : '👁️';
+      });
+
+      function showAlert(msg, isError) {
+        alertBox.textContent = msg;
+        alertBox.className = 'auth-alert-box ' + (isError ? 'error' : 'success');
+      }
+
+      function clearAlert() {
+        alertBox.textContent = '';
+        alertBox.className = 'auth-alert-box';
+      }
+
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        clearAlert();
+
+        const email = emailInput.value.trim();
+        const passcode = passcodeInput.value.trim();
+
+        if (!email) {
+          showAlert('Please provide the authorized administrator email.', true);
+          emailInput.focus();
+          return;
+        }
+
+        if (!passcode) {
+          showAlert('Please enter the administrator passcode.', true);
+          passcodeInput.focus();
+          return;
+        }
+
+        btnSubmit.disabled = true;
+        btnText.textContent = 'Verifying credentials...';
+        btnSpinner.style.display = 'inline-block';
+
+        try {
+          const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify({ email, passcode })
+          });
+
+          const data = await res.json();
+
+          if (!res.ok) {
+            throw new Error(data.error || 'Authentication failed. Please verify your passcode.');
+          }
+
+          showAlert('Identity confirmed! Launching marketing workspace...', false);
+          btnText.textContent = 'Access Granted!';
+
+          // Clean up any legacy token storage; authentication is strictly mediated via httpOnly cookie
+          try {
+            localStorage.removeItem('lbh_admin_token');
+          } catch (_) {}
+
+          // Redirect to /admin which verifies the active httpOnly session cookie
+          setTimeout(function() {
+            window.location.href = '/admin';
+          }, 350);
+
+        } catch (err) {
+          showAlert(err.message || 'An error occurred during authentication.', true);
+          btnSubmit.disabled = false;
+          btnText.textContent = 'Sign In to Dashboard';
+          btnSpinner.style.display = 'none';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

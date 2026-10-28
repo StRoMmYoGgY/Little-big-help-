@@ -1,0 +1,103 @@
+{
+  "backupId": "backup-1793097596",
+  "exportedAt": "2026-10-27T10:39:56.190872+00:00",
+  "version": "1.0",
+  "app": "Little Big Help Marketing Engine",
+  "campaignsCount": 2,
+  "campaigns": [
+    {
+      "id": "camp-welcome-sylhet",
+      "title": "Sylhet Local Errands & Assistance Campaign",
+      "serviceCategory": "Local Assistance",
+      "targetAudience": "Sylhet Residents & Expatriate Families",
+      "goal": "Brand Awareness & WhatsApp Inquiries",
+      "aspectRatio": "1:1",
+      "headline": "Need something taken care of in Sylhet?",
+      "hook": "From hospital visits to grocery pickups and bill payments, we have got you covered.",
+      "bodyCopy": "Life gets busy, but you don't have to handle everything alone. Little Big Help provides trustworthy, verified local hands right across Sylhet. Whether you are living locally or taking care of family from abroad, tell us what you need.\n\n\u2713 Transparent pricing\n\u2713 Real-time task updates on WhatsApp\n\u2713 Fast and dependable assistance",
+      "callToAction": "Message us on WhatsApp to discuss your task today!",
+      "hashtags": [
+        "#Sylhet",
+        "#LittleBigHelp",
+        "#SylhetServices",
+        "#LocalHelp",
+        "#SmallTasksBigRelief"
+      ],
+      "graphicData": {
+        "bannerType": "services_highlight",
+        "headline": "Your Reliable Hands in Sylhet",
+        "subhead": "Errands \u2022 Pickups \u2022 Local Support",
+        "accentColor": "#F26A5A",
+        "bgColor": "#2C3E50",
+        "textColor": "#FFFFFF",
+        "badgeText": "Verified Local Service"
+      },
+      "status": "draft",
+      "approval": {
+        "approved": false,
+        "approvedAt": null,
+        "approvedBy": null
+      },
+      "platforms": [
+        "facebook",
+        "instagram"
+      ],
+      "scheduledFor": null,
+      "publishedAt": null,
+      "metaPublishResult": null,
+      "createdAt": "2026-10-27T04:29:53.259Z",
+      "updatedAt": "2026-10-27T04:30:38.809Z"
+    },
+    {
+      "id": "camp-web-dev",
+      "title": "New Service: Website Design for Small Businesses",
+      "serviceCategory": "Website Design & Development",
+      "targetAudience": "Local Shop Owners, Doctors, Consultants & Entrepreneurs",
+      "goal": "Lead Generation",
+      "aspectRatio": "1:1",
+      "headline": "Give Your Business a Professional Website",
+      "hook": "Stop losing customers to outdated pages or broken contact forms.",
+      "bodyCopy": "Little Big Help now builds clean, modern, and lightning-fast websites tailored for Sylhet businesses and service providers.\n\n\u2022 Mobile-optimized and responsive\n\u2022 Direct WhatsApp chat integration for instant customer inquiries\n\u2022 Fast delivery with transparent pricing\n\u2022 Optional monthly maintenance & updates\n\nLet's build a website you are proud to share.",
+      "callToAction": "Chat on WhatsApp: +880 1865-383565 to discuss your website project.",
+      "hashtags": [
+        "#WebsiteDesignSylhet",
+        "#LittleBigHelp",
+        "#WebDevelopment",
+        "#SylhetBusiness",
+        "#GrowOnline"
+      ],
+      "graphicData": {
+        "bannerType": "web_launch",
+        "headline": "Modern Websites for Sylhet Businesses",
+        "subhead": "Built fast. Designed for results. Easy maintenance.",
+        "accentColor": "#28A745",
+        "bgColor": "#1E293B",
+        "textColor": "#FFFFFF",
+        "badgeText": "New Service Launch"
+      },
+      "status": "draft",
+      "approval": {
+        "approved": false,
+        "approvedAt": null,
+        "approvedBy": null
+      },
+      "platforms": [
+        "facebook",
+        "instagram"
+      ],
+      "scheduledFor": null,
+      "publishedAt": null,
+      "metaPublishResult": null,
+      "createdAt": "2026-10-27T04:29:53.259Z",
+      "updatedAt": "2026-10-27T04:29:53.259Z"
+    }
+  ],
+  "settings": {
+    "authorizedAdminEmail": "orghosimsung@gmail.com",
+    "facebookPageId": "",
+    "instagramAccountId": "",
+    "metaAppId": "",
+    "hasTokenConfigured": false,
+    "timezone": "Asia/Dhaka"
+  }
+}
