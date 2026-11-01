@@ -54,7 +54,15 @@ function isAuthorizedAdminEmail(email) {
 }
 
 // Cryptographic session secret
-const SESSION_SECRET = process.env.ADMIN_SESSION_SECRET || crypto.randomBytes(32).toString('hex');
+const initialSettings = fs.existsSync(SETTINGS_FILE) ? JSON.parse(fs.readFileSync(SETTINGS_FILE, 'utf8')) : {};
+const SESSION_SECRET = (process.env.ADMIN_SESSION_SECRET || '').trim() || initialSettings.adminSessionSecret || (() => {
+  const generated = crypto.randomBytes(32).toString('hex');
+  initialSettings.adminSessionSecret = generated;
+  try {
+    fs.writeFileSync(SETTINGS_FILE, JSON.stringify(initialSettings, null, 2), 'utf8');
+  } catch (_) {}
+  return generated;
+})();
 
 // In-memory brute-force protection
 const loginAttempts = new Map(); // ip -> { count, lockedUntil }
@@ -229,12 +237,21 @@ async function getStoredCampaigns() {
   if (firestoreDb) {
     try {
       const snap = await getDocs(collection(firestoreDb, 'campaigns'));
+      firestoreStatus.connected = true;
       if (snap.docs.length > 0) {
         const campaigns = snap.docs.map(d => d.data());
         campaigns.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
-        firestoreStatus.connected = true;
         writeJsonAtomic(CAMPAIGNS_FILE, campaigns);
         return campaigns;
+      } else {
+        // If Firestore is empty, seed with initial campaigns from local cache
+        const localCampaigns = readJson(CAMPAIGNS_FILE) || [];
+        if (localCampaigns.length > 0) {
+          for (const camp of localCampaigns) {
+            await setDoc(doc(firestoreDb, 'campaigns', camp.id), camp).catch(() => {});
+          }
+        }
+        return localCampaigns;
       }
     } catch (err) {
       console.warn('[Firestore] Error querying campaigns, using local cache:', err.message);
@@ -311,7 +328,12 @@ function verifyPasscode(enteredPasscode) {
 
   const settings = readJson(SETTINGS_FILE) || {};
 
-  // 1. Check cryptographically hashed credentials in settings
+  // 1. Check environment variable (highest priority)
+  if (process.env.ADMIN_PASSCODE && timingSafeCompare(cleanEntered, process.env.ADMIN_PASSCODE.trim())) {
+    return true;
+  }
+
+  // 2. Check cryptographically hashed credentials in settings
   if (settings.adminPasscodeHash && settings.adminPasscodeSalt) {
     try {
       const computed = crypto.scryptSync(cleanEntered, settings.adminPasscodeSalt, 64).toString('hex');
@@ -319,11 +341,6 @@ function verifyPasscode(enteredPasscode) {
         return true;
       }
     } catch (_) {}
-  }
-
-  // 2. Check environment variable
-  if (process.env.ADMIN_PASSCODE && timingSafeCompare(cleanEntered, process.env.ADMIN_PASSCODE.trim())) {
-    return true;
   }
 
   // 3. Check dynamic runtime fallback
@@ -373,6 +390,64 @@ app.use((err, req, res, next) => {
     return res.status(400).json({ error: 'Bad Request: Malformed JSON payload' });
   }
   next(err);
+});
+
+// ----------------- BACKEND API HEALTH CHECK -----------------
+app.get('/api/health', async (req, res) => {
+  let firestoreConnected = false;
+  if (firestoreDb) {
+    try {
+      const snap = await getDocs(collection(firestoreDb, 'system'));
+      firestoreConnected = true;
+    } catch (err) {
+      firestoreConnected = firestoreStatus.connected || false;
+    }
+  }
+
+  const campaigns = await getStoredCampaigns();
+  const settings = readJson(SETTINGS_FILE) || {};
+
+  return res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    uptime: Math.floor(process.uptime()),
+    environment: process.env.NODE_ENV || 'development',
+    firestore: {
+      connected: firestoreConnected || firestoreStatus.connected,
+      databaseId: firestoreStatus.databaseId || null,
+      error: firestoreStatus.error || null
+    },
+    storage: {
+      campaignsOnline: campaigns.length,
+      mode: firestoreDb ? 'firestore_persistent' : 'local_file'
+    },
+    credentialsConfigured: {
+      adminEmail: Boolean(process.env.ADMIN_EMAIL || AUTHORIZED_ADMIN_EMAIL),
+      adminPasscode: Boolean(process.env.ADMIN_PASSCODE || settings.adminPasscodeHash),
+      adminSessionSecret: Boolean(process.env.ADMIN_SESSION_SECRET || settings.adminSessionSecret),
+      metaAppId: Boolean(process.env.META_APP_ID || settings.metaAppId),
+      metaPageId: Boolean(process.env.META_PAGE_ID || settings.facebookPageId),
+      metaPageAccessToken: Boolean(process.env.META_PAGE_ACCESS_TOKEN || settings.metaPageAccessToken),
+      metaInstagramAccountId: Boolean(process.env.META_INSTAGRAM_ACCOUNT_ID || settings.instagramAccountId),
+      metaAppSecret: Boolean(process.env.META_APP_SECRET),
+      metaWebhookVerifyToken: Boolean(process.env.META_WEBHOOK_VERIFY_TOKEN)
+    },
+    metaStatus: {
+      graphApiVersion: META_GRAPH_VERSION,
+      connected: settings.metaConnected || false,
+      channels: {
+        facebookPages: settings.metaConnected ? 'Active' : 'Pending Credentials',
+        instagramPublishing: settings.metaConnected ? 'Active' : 'Pending Credentials',
+        messenger: 'Pending Pages Messaging Permission',
+        whatsApp: 'Active (Direct Chat Integration: +880 1865-383565)',
+        metaAdvertising: 'Pending Marketing API Ads Token'
+      }
+    },
+    webhooks: {
+      endpoint: '/webhooks/instagram',
+      status: (process.env.META_WEBHOOK_VERIFY_TOKEN && process.env.META_APP_SECRET) ? 'active' : 'standby'
+    }
+  });
 });
 
 // Priority 1: Secure Session Management & Expiration (30 Days Persistent Lifetime)
@@ -553,7 +628,7 @@ app.post('/api/auth/login', async (req, res) => {
   res.cookie('lbh_admin_session', token, {
     httpOnly: true,
     secure: isHttps,
-    sameSite: 'lax',
+    sameSite: isHttps ? 'none' : 'lax',
     maxAge: SESSION_LIFETIME_MS,
     expires: new Date(Date.now() + SESSION_LIFETIME_MS),
     path: '/'
@@ -564,10 +639,10 @@ app.post('/api/auth/login', async (req, res) => {
     return res.redirect('/admin');
   }
 
-  // Never return token in JSON body; authentication is strictly mediated by the httpOnly cookie
   return res.json({
     success: true,
     redirect: '/admin',
+    token,
     user: {
       email: normalizedEmail,
       role: 'Administrator',

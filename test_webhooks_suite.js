@@ -221,10 +221,12 @@ async function run() {
   // 11. Existing admin login & campaigns API sanity check
   await test('11. Existing Admin Login & Protected API Preservation', async () => {
     // 1. Login with admin credentials
+    const adminEmail = process.env.ADMIN_EMAIL || 'orghosimsung@gmail.com';
+    const adminPasscode = process.env.ADMIN_PASSCODE || 'LBH-Sylhet!7264#Mango';
     const loginRes = await fetch(`${BASE}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: 'orghosimsung@gmail.com', passcode: 'LBH-Sylhet!7264#Mango' })
+      body: JSON.stringify({ email: adminEmail, passcode: adminPasscode })
     });
     if (loginRes.status !== 200) throw new Error(`Admin login failed: ${loginRes.status}`);
     const loginData = await loginRes.json();

@@ -479,12 +479,12 @@
           showAlert('Identity confirmed! Launching marketing workspace...', false);
           btnText.textContent = 'Access Granted!';
 
-          // Clean up any legacy token storage; authentication is strictly mediated via httpOnly cookie
-          try {
-            localStorage.removeItem('lbh_admin_token');
-          } catch (_) {}
+          // Store session token in sessionStorage for resilient iframe authentication
+          if (data.token) {
+            sessionStorage.setItem('lbh_admin_token', data.token);
+          }
 
-          // Redirect to /admin which verifies the active httpOnly session cookie
+          // Redirect to /admin which verifies the active session
           setTimeout(function() {
             window.location.href = '/admin';
           }, 350);

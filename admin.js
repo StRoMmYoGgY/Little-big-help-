@@ -40,9 +40,13 @@ brandLogoImg.onload = () => {
 };
 
 // ----------------- AUTHENTICATION (Priority 1) -----------------
-// Centralized authenticated fetch with credentials (httpOnly cookie)
+// Centralized authenticated fetch with credentials (httpOnly cookie + Bearer token fallback)
 async function authFetch(url, options = {}) {
   const headers = { ...(options.headers || {}) };
+  const storedToken = sessionStorage.getItem('lbh_admin_token');
+  if (storedToken && !headers['Authorization']) {
+    headers['Authorization'] = `Bearer ${storedToken}`;
+  }
   const opts = {
     ...options,
     headers,
@@ -67,7 +71,13 @@ async function authFetch(url, options = {}) {
 let authRetryCount = 0;
 async function checkAuth() {
   try {
+    const headers = {};
+    const storedToken = sessionStorage.getItem('lbh_admin_token');
+    if (storedToken) {
+      headers['Authorization'] = `Bearer ${storedToken}`;
+    }
     const res = await fetch('/api/auth/me', {
+      headers,
       credentials: 'include'
     });
 
@@ -112,12 +122,19 @@ function showAdminApp() {
 }
 
 function logout() {
+  const headers = {};
+  const storedToken = sessionStorage.getItem('lbh_admin_token');
+  if (storedToken) {
+    headers['Authorization'] = `Bearer ${storedToken}`;
+  }
   fetch('/api/auth/logout', {
     method: 'POST',
+    headers,
     credentials: 'include'
   }).finally(() => {
     currentAdminUser = null;
     try {
+      sessionStorage.removeItem('lbh_admin_token');
       localStorage.removeItem('lbh_admin_token');
     } catch (_) {}
     window.location.href = '/admin';
@@ -147,6 +164,9 @@ if (loginForm) {
         throw new Error(data.error || 'Failed to authenticate');
       }
 
+      if (data.token) {
+        sessionStorage.setItem('lbh_admin_token', data.token);
+      }
       currentAdminUser = data.user;
       showAdminApp();
       loadInitialData();
@@ -1142,16 +1162,39 @@ function renderMetaSettingsUI() {
     hint.textContent = 'No token stored. Please paste your Meta Page Access Token.';
   }
 
+  const statusChanFb = document.getElementById('status-chan-fb');
+  const cardChanFb = document.getElementById('card-chan-fb');
+  const statusChanIg = document.getElementById('status-chan-ig');
+  const cardChanIg = document.getElementById('card-chan-ig');
+
   if (metaSettings.metaConnected) {
     badge.className = 'connection-pill online';
     badgeText.textContent = `Connected: ${metaSettings.pageName || 'Facebook Page'}`;
     topbarMetaStatus.innerHTML = '<span class="status-indicator success"></span><span>Meta: Connected</span>';
     navMetaDot.className = 'connection-status-dot online';
+
+    if (statusChanFb && cardChanFb) {
+      cardChanFb.classList.add('active');
+      statusChanFb.innerHTML = '<span class="badge-active">✓ Active / Connected</span>';
+    }
+    if (statusChanIg && cardChanIg && metaSettings.instagramAccountId) {
+      cardChanIg.classList.add('active');
+      statusChanIg.innerHTML = '<span class="badge-active">✓ Active / Linked</span>';
+    }
   } else {
     badge.className = 'connection-pill offline';
     badgeText.textContent = 'Disconnected';
     topbarMetaStatus.innerHTML = '<span class="status-indicator danger"></span><span>Meta: Disconnected</span>';
     navMetaDot.className = 'connection-status-dot offline';
+
+    if (statusChanFb && cardChanFb) {
+      cardChanFb.classList.remove('active');
+      statusChanFb.innerHTML = '<span class="badge-pending">Pending Token / Page ID</span>';
+    }
+    if (statusChanIg && cardChanIg) {
+      cardChanIg.classList.remove('active');
+      statusChanIg.innerHTML = '<span class="badge-pending">Pending Token & Account ID</span>';
+    }
   }
 
   const webhookPill = document.getElementById('webhook-status-pill');

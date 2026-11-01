@@ -7,6 +7,7 @@
     "dev": "node server.js",
     "start": "node server.js",
     "build": "vite build",
+    "test:system": "node test_complete_system.js",
     "test:webhooks": "node test_webhooks_suite.js",
     "preview": "vite preview --host 0.0.0.0 --port 3000"
   },

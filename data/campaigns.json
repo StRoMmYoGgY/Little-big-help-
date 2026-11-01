@@ -1,24 +1,29 @@
 [
   {
-    "serviceCategory": "Website Design & Development",
-    "goal": "Lead Generation",
-    "createdAt": "2026-10-27T04:29:53.259Z",
-    "bodyCopy": "Little Big Help now builds clean, modern, and lightning-fast websites tailored for Sylhet businesses and service providers.\n\n• Mobile-optimized and responsive\n• Direct WhatsApp chat integration for instant customer inquiries\n• Fast delivery with transparent pricing\n• Optional monthly maintenance & updates\n\nLet's build a website you are proud to share.",
-    "updatedAt": "2026-10-27T04:29:53.259Z",
+    "approval": {
+      "approved": false,
+      "approvedAt": null,
+      "approvedBy": null
+    },
+    "id": "camp-web-dev",
     "status": "draft",
     "graphicData": {
-      "subhead": "Built fast. Designed for results. Easy maintenance.",
       "badgeText": "New Service Launch",
       "accentColor": "#28A745",
-      "bgColor": "#1E293B",
-      "headline": "Modern Websites for Sylhet Businesses",
+      "textColor": "#FFFFFF",
       "bannerType": "web_launch",
-      "textColor": "#FFFFFF"
+      "subhead": "Built fast. Designed for results. Easy maintenance.",
+      "bgColor": "#1E293B",
+      "headline": "Modern Websites for Sylhet Businesses"
     },
-    "publishedAt": null,
-    "targetAudience": "Local Shop Owners, Doctors, Consultants & Entrepreneurs",
-    "title": "New Service: Website Design for Small Businesses",
-    "aspectRatio": "1:1",
+    "hook": "Stop losing customers to outdated pages or broken contact forms.",
+    "platforms": [
+      "facebook",
+      "instagram"
+    ],
+    "goal": "Lead Generation",
+    "bodyCopy": "Little Big Help now builds clean, modern, and lightning-fast websites tailored for Sylhet businesses and service providers.\n\n• Mobile-optimized and responsive\n• Direct WhatsApp chat integration for instant customer inquiries\n• Fast delivery with transparent pricing\n• Optional monthly maintenance & updates\n\nLet's build a website you are proud to share.",
+    "updatedAt": "2026-10-27T04:29:53.259Z",
     "hashtags": [
       "#WebsiteDesignSylhet",
       "#LittleBigHelp",
@@ -26,63 +31,58 @@
       "#SylhetBusiness",
       "#GrowOnline"
     ],
+    "metaPublishResult": null,
+    "publishedAt": null,
+    "targetAudience": "Local Shop Owners, Doctors, Consultants & Entrepreneurs",
     "scheduledFor": null,
+    "callToAction": "Chat on WhatsApp: +880 1865-383565 to discuss your website project.",
+    "createdAt": "2026-10-27T04:29:53.259Z",
     "headline": "Give Your Business a Professional Website",
+    "serviceCategory": "Website Design & Development",
+    "aspectRatio": "1:1",
+    "title": "New Service: Website Design for Small Businesses"
+  },
+  {
+    "publishedAt": null,
+    "title": "Sylhet Local Errands & Assistance Campaign",
+    "bodyCopy": "Life gets busy, but you don't have to handle everything alone. Little Big Help provides trustworthy, verified local hands right across Sylhet. Whether you are living locally or taking care of family from abroad, tell us what you need.\n\n✓ Transparent pricing\n✓ Real-time task updates on WhatsApp\n✓ Fast and dependable assistance",
+    "createdAt": "2026-10-27T04:29:53.259Z",
+    "targetAudience": "Sylhet Residents & Expatriate Families",
+    "serviceCategory": "Local Assistance",
+    "aspectRatio": "1:1",
     "approval": {
       "approvedAt": null,
-      "approvedBy": null,
-      "approved": false
+      "approved": false,
+      "approvedBy": null
     },
+    "hook": "From hospital visits to grocery pickups and bill payments, we have got you covered.",
+    "goal": "Brand Awareness & WhatsApp Inquiries",
+    "scheduledFor": null,
+    "updatedAt": "2026-10-27T04:30:38.809Z",
+    "headline": "Need something taken care of in Sylhet?",
     "platforms": [
       "facebook",
       "instagram"
     ],
-    "hook": "Stop losing customers to outdated pages or broken contact forms.",
+    "id": "camp-welcome-sylhet",
+    "status": "draft",
+    "callToAction": "Message us on WhatsApp to discuss your task today!",
     "metaPublishResult": null,
-    "callToAction": "Chat on WhatsApp: +880 1865-383565 to discuss your website project.",
-    "id": "camp-web-dev"
-  },
-  {
+    "graphicData": {
+      "badgeText": "Verified Local Service",
+      "textColor": "#FFFFFF",
+      "bannerType": "services_highlight",
+      "headline": "Your Reliable Hands in Sylhet",
+      "accentColor": "#F26A5A",
+      "bgColor": "#2C3E50",
+      "subhead": "Errands • Pickups • Local Support"
+    },
     "hashtags": [
       "#Sylhet",
       "#LittleBigHelp",
       "#SylhetServices",
       "#LocalHelp",
       "#SmallTasksBigRelief"
-    ],
-    "publishedAt": null,
-    "scheduledFor": null,
-    "graphicData": {
-      "textColor": "#FFFFFF",
-      "subhead": "Errands • Pickups • Local Support",
-      "accentColor": "#F26A5A",
-      "bgColor": "#2C3E50",
-      "badgeText": "Verified Local Service",
-      "headline": "Your Reliable Hands in Sylhet",
-      "bannerType": "services_highlight"
-    },
-    "hook": "From hospital visits to grocery pickups and bill payments, we have got you covered.",
-    "aspectRatio": "1:1",
-    "status": "draft",
-    "bodyCopy": "Life gets busy, but you don't have to handle everything alone. Little Big Help provides trustworthy, verified local hands right across Sylhet. Whether you are living locally or taking care of family from abroad, tell us what you need.\n\n✓ Transparent pricing\n✓ Real-time task updates on WhatsApp\n✓ Fast and dependable assistance",
-    "callToAction": "Message us on WhatsApp to discuss your task today!",
-    "metaPublishResult": null,
-    "platforms": [
-      "facebook",
-      "instagram"
-    ],
-    "title": "Sylhet Local Errands & Assistance Campaign",
-    "serviceCategory": "Local Assistance",
-    "createdAt": "2026-10-27T04:29:53.259Z",
-    "id": "camp-welcome-sylhet",
-    "approval": {
-      "approvedAt": null,
-      "approved": false,
-      "approvedBy": null
-    },
-    "targetAudience": "Sylhet Residents & Expatriate Families",
-    "goal": "Brand Awareness & WhatsApp Inquiries",
-    "updatedAt": "2026-10-27T04:30:38.809Z",
-    "headline": "Need something taken care of in Sylhet?"
+    ]
   }
 ]
