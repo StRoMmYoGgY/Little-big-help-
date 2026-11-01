@@ -9,8 +9,8 @@
   <link rel="stylesheet" href="/admin.css" />
 </head>
 <body class="admin-body">
-  <!-- Auth Barrier Screen -->
-  <div id="auth-screen" class="auth-wrapper">
+  <!-- Auth Barrier Screen (Fallback) -->
+  <div id="auth-screen" class="auth-wrapper hidden">
     <div class="auth-card">
       <div class="auth-header">
         <img src="/assets/images/interlocking-relief-social-tile.png" alt="Little Big Help" class="auth-logo" />
@@ -61,7 +61,7 @@
   </div>
 
   <!-- Main Admin Application Container -->
-  <div id="admin-app" class="admin-layout hidden">
+  <div id="admin-app" class="admin-layout">
     <!-- Sidebar Navigation -->
     <aside class="admin-sidebar">
       <div class="sidebar-brand">
@@ -776,6 +776,47 @@
           <div id="meta-test-result" class="test-result-box hidden">
             <!-- Dynamic feedback -->
           </div>
+        </div>
+
+        <!-- Instagram Webhook Integration Card -->
+        <div class="content-card settings-card mt-4">
+          <div class="content-card-header">
+            <div>
+              <h3>🔔 Instagram Webhook Integration</h3>
+              <p class="section-desc">Receive real-time notifications for Instagram events (comments, mentions, messages) securely via Meta Graph API.</p>
+            </div>
+            <span class="connection-pill offline" id="webhook-status-pill">
+              <span class="pill-dot"></span>
+              <span id="webhook-status-label">Standby</span>
+            </span>
+          </div>
+
+          <div class="persistence-info-box">
+            <div class="persistence-stat">
+              <div class="p-label">Callback URL (GET / POST)</div>
+              <div class="p-value"><code>/webhooks/instagram</code></div>
+            </div>
+            <div class="persistence-stat">
+              <div class="p-label">Verification Mode</div>
+              <div class="p-value"><code>hub.mode=subscribe</code> (timing-safe token validation)</div>
+            </div>
+            <div class="persistence-stat">
+              <div class="p-label">Signature Security</div>
+              <div class="p-value text-success">✓ HMAC-SHA256 (<code>X-Hub-Signature-256</code>)</div>
+            </div>
+            <div class="persistence-stat">
+              <div class="p-label">Deduplication Protection</div>
+              <div class="p-value">Active (24-hour event TTL cache)</div>
+            </div>
+          </div>
+
+          <div class="settings-actions mt-3">
+            <button type="button" id="btn-check-webhook-status" class="btn btn-outline">
+              <span class="btn-text">🔄 Check Webhook Readiness</span>
+              <span class="spinner hidden" id="webhook-check-spinner"></span>
+            </button>
+          </div>
+          <div id="webhook-status-feedback" class="test-result-box hidden mt-3"></div>
         </div>
 
         <!-- Data Persistence & Safe Backup Card (Priority 2) -->

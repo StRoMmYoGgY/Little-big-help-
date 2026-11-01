@@ -7,5 +7,7 @@
   "metaConnected": false,
   "lastCheckedAt": null,
   "timezone": "Asia/Dhaka",
-  "passcodeUpdatedAt": "2026-10-27T10:36:47.972Z"
+  "adminPasscodeHash": "ff76af6ff39f6090c96319fac91416ee9353a6106760ecc31a58a6968dbb84f049c3b117646a82ce2ea5455d1e36e04cd6f374056256f6be37b6fd613a0b36ee",
+  "adminPasscodeSalt": "59df6655f32ced5c5fe89a4a7f0990ea",
+  "passcodeUpdatedAt": "2026-10-31T23:00:00.000Z"
 }

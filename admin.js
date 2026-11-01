@@ -1,7 +1,11 @@
 // Little Big Help - AI Marketing Dashboard & Social Publishing System
 // Client controller for private administrator area
 
-let currentToken = localStorage.getItem('lbh_admin_token') || null;
+// Clean up any legacy token in localStorage; session is strictly handled via httpOnly cookie
+try {
+  localStorage.removeItem('lbh_admin_token');
+} catch (_) {}
+
 let currentAdminUser = null;
 let allCampaigns = [];
 let activeCampaign = null;
@@ -36,39 +40,47 @@ brandLogoImg.onload = () => {
 };
 
 // ----------------- AUTHENTICATION (Priority 1) -----------------
-// Centralized authenticated fetch with credentials (httpOnly cookie) and token fallback
+// Centralized authenticated fetch with credentials (httpOnly cookie)
 async function authFetch(url, options = {}) {
   const headers = { ...(options.headers || {}) };
-  if (currentToken) {
-    headers['Authorization'] = `Bearer ${currentToken}`;
-  }
   const opts = {
     ...options,
     headers,
     credentials: 'include'
   };
 
-  const res = await fetch(url, opts);
-  if (res.status === 401 && !url.includes('/api/auth/login')) {
-    showAlert('Session expired or unauthorized. Please sign in again.', 'warning');
-    logout();
+  try {
+    const res = await fetch(url, opts);
+    if (res.status === 401 && !url.includes('/api/auth/login')) {
+      showAlert('Session expired or unauthorized. Please sign in again.', 'warning');
+      logout();
+    }
+    return res;
+  } catch (err) {
+    // Network error: do NOT automatically log out
+    console.error('Network request failed:', err);
+    showAlert('Network error communicating with server: ' + err.message, 'danger');
+    throw err;
   }
-  return res;
 }
 
+let authRetryCount = 0;
 async function checkAuth() {
   try {
-    const headers = {};
-    if (currentToken) {
-      headers['Authorization'] = `Bearer ${currentToken}`;
-    }
     const res = await fetch('/api/auth/me', {
-      headers,
       credentials: 'include'
     });
+
+    if (res.status === 401) {
+      // Confirmed unauthorized session: redirect to login
+      window.location.href = '/admin';
+      return;
+    }
+
     const data = await res.json();
     
     if (data.authenticated && data.user) {
+      authRetryCount = 0;
       currentAdminUser = data.user;
       showAdminApp();
       loadInitialData();
@@ -76,8 +88,14 @@ async function checkAuth() {
       window.location.href = '/admin';
     }
   } catch (err) {
-    console.error('Auth verification error:', err);
-    window.location.href = '/admin';
+    console.warn('Network issue verifying session, retrying:', err);
+    // Do NOT redirect or log out on network glitch to avoid sign-in redirect loops
+    authRetryCount++;
+    if (authRetryCount < 4) {
+      setTimeout(checkAuth, 2500);
+    } else {
+      showAlert('Unable to reach server. Please check your internet connection.', 'warning');
+    }
   }
 }
 
@@ -96,54 +114,52 @@ function showAdminApp() {
 function logout() {
   fetch('/api/auth/logout', {
     method: 'POST',
-    credentials: 'include',
-    headers: currentToken ? { Authorization: `Bearer ${currentToken}` } : {}
-  }).catch(() => {});
-
-  currentToken = null;
-  currentAdminUser = null;
-  localStorage.removeItem('lbh_admin_token');
-  window.location.href = '/admin';
+    credentials: 'include'
+  }).finally(() => {
+    currentAdminUser = null;
+    try {
+      localStorage.removeItem('lbh_admin_token');
+    } catch (_) {}
+    window.location.href = '/admin';
+  });
 }
 
-loginForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  loginError.classList.add('hidden');
-  loginSpinner.classList.remove('hidden');
-  btnLogin.disabled = true;
+if (loginForm) {
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    loginError.classList.add('hidden');
+    loginSpinner.classList.remove('hidden');
+    btnLogin.disabled = true;
 
-  const email = document.getElementById('admin-email').value;
-  const passcode = document.getElementById('admin-passcode').value;
+    const email = document.getElementById('admin-email').value;
+    const passcode = document.getElementById('admin-passcode').value;
 
-  try {
-    const res = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ email, passcode })
-    });
-    const data = await res.json();
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email, passcode })
+      });
+      const data = await res.json();
 
-    if (!res.ok) {
-      throw new Error(data.error || 'Failed to authenticate');
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to authenticate');
+      }
+
+      currentAdminUser = data.user;
+      showAdminApp();
+      loadInitialData();
+      showAlert('Welcome, Administrator! You are securely authenticated.', 'success');
+    } catch (err) {
+      loginError.textContent = err.message;
+      loginError.classList.remove('hidden');
+    } finally {
+      loginSpinner.classList.add('hidden');
+      btnLogin.disabled = false;
     }
-
-    currentToken = data.token;
-    currentAdminUser = data.user;
-    if (currentToken) {
-      localStorage.setItem('lbh_admin_token', currentToken);
-    }
-    showAdminApp();
-    loadInitialData();
-    showAlert('Welcome, Administrator! You are securely authenticated.', 'success');
-  } catch (err) {
-    loginError.textContent = err.message;
-    loginError.classList.remove('hidden');
-  } finally {
-    loginSpinner.classList.add('hidden');
-    btnLogin.disabled = false;
-  }
-});
+  });
+}
 
 document.getElementById('btn-logout').addEventListener('click', logout);
 
@@ -1137,6 +1153,18 @@ function renderMetaSettingsUI() {
     topbarMetaStatus.innerHTML = '<span class="status-indicator danger"></span><span>Meta: Disconnected</span>';
     navMetaDot.className = 'connection-status-dot offline';
   }
+
+  const webhookPill = document.getElementById('webhook-status-pill');
+  const webhookLabel = document.getElementById('webhook-status-label');
+  if (webhookPill && webhookLabel && metaSettings.webhookConfig) {
+    if (metaSettings.webhookConfig.verifyTokenConfigured && metaSettings.webhookConfig.appSecretConfigured) {
+      webhookPill.className = 'connection-pill online';
+      webhookLabel.textContent = 'Ready (Active)';
+    } else {
+      webhookPill.className = 'connection-pill offline';
+      webhookLabel.textContent = 'Pending Env Vars';
+    }
+  }
 }
 
 // Toggle token visibility
@@ -1225,6 +1253,44 @@ document.getElementById('btn-test-meta-connection').addEventListener('click', as
 function escapeHtml(str) {
   if (!str) return '';
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// Check Instagram Webhook Readiness
+const btnCheckWebhook = document.getElementById('btn-check-webhook-status');
+if (btnCheckWebhook) {
+  btnCheckWebhook.addEventListener('click', async () => {
+    const spinner = document.getElementById('webhook-check-spinner');
+    const feedback = document.getElementById('webhook-status-feedback');
+    btnCheckWebhook.disabled = true;
+    if (spinner) spinner.classList.remove('hidden');
+    if (feedback) feedback.classList.add('hidden');
+
+    try {
+      const res = await fetch('/webhooks/instagram/status');
+      const data = await res.json();
+      if (feedback) {
+        feedback.classList.remove('hidden');
+        const isReady = data.status === 'ready';
+        feedback.className = `test-result-box ${isReady ? 'success' : 'warning'}`;
+        feedback.innerHTML = `
+          <strong>${isReady ? '✓ Webhook Endpoint Ready' : '⚠️ Configuration Required'}</strong><br />
+          Endpoint: <code>${escapeHtml(data.endpoint)}</code><br />
+          Verification Token: <strong>${data.configuration.verifyTokenConfigured ? 'Configured (✓)' : 'Pending (Set META_WEBHOOK_VERIFY_TOKEN)'}</strong><br />
+          App Secret: <strong>${data.configuration.appSecretConfigured ? 'Configured (✓)' : 'Pending (Set META_APP_SECRET)'}</strong><br />
+          <small class="text-muted mt-1" style="display:block;">${escapeHtml(data.message)}</small>
+        `;
+      }
+    } catch (err) {
+      if (feedback) {
+        feedback.classList.remove('hidden');
+        feedback.className = 'test-result-box error';
+        feedback.innerHTML = `<strong>Error:</strong> ${escapeHtml(err.message)}`;
+      }
+    } finally {
+      btnCheckWebhook.disabled = false;
+      if (spinner) spinner.classList.add('hidden');
+    }
+  });
 }
 // ----------------- DATA PERSISTENCE & BACKUP (Priority 2) -----------------
 const btnExportBackup = document.getElementById('btn-export-backup');

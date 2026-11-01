@@ -1,3 +1,4 @@
+import http from 'http';
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
@@ -19,10 +20,10 @@ import {
   getDocs
 } from 'firebase/firestore';
 
-dotenv.config();
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -45,6 +46,7 @@ const AUTHORIZED_ADMIN_EMAILS = [
   'orghosung@gmail.com',
   (process.env.ADMIN_EMAIL || '').trim().toLowerCase()
 ].filter(Boolean);
+const AUTHORIZED_ADMIN_EMAIL = AUTHORIZED_ADMIN_EMAILS[0];
 
 function isAuthorizedAdminEmail(email) {
   if (!email || typeof email !== 'string') return false;
@@ -345,9 +347,33 @@ app.use(cors({
   origin: true,
   credentials: true
 }));
-app.use(express.json({ limit: '25mb' }));
+
+// Webhook raw body capture for Instagram webhooks (preserves exact binary payload for HMAC-SHA256 signature validation)
+app.use('/webhooks/instagram', express.raw({
+  type: '*/*',
+  limit: '10mb'
+}));
+
+// Standard JSON and URL-encoded body parsers for all application routes
+app.use(express.json({
+  limit: '25mb',
+  verify: (req, res, buf) => {
+    req.rawBody = buf;
+  }
+}));
 app.use(express.urlencoded({ extended: true, limit: '25mb' }));
 app.use(cookieParser(SESSION_SECRET));
+
+// Safe handling for malformed JSON payloads
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    if (req.path.startsWith('/webhooks/')) {
+      return res.status(400).json({ error: 'Bad Request: Malformed JSON payload' });
+    }
+    return res.status(400).json({ error: 'Bad Request: Malformed JSON payload' });
+  }
+  next(err);
+});
 
 // Priority 1: Secure Session Management & Expiration (30 Days Persistent Lifetime)
 const SESSION_LIFETIME_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
@@ -447,7 +473,7 @@ async function requireAdmin(req, res, next) {
 }
 
 // ----------------- AUTH ENDPOINTS (Priority 1) -----------------
-app.post('/api/auth/login', (req, res) => {
+app.post('/api/auth/login', async (req, res) => {
   const clientIp = req.ip || req.connection?.remoteAddress || 'unknown';
   const now = Date.now();
 
@@ -1037,7 +1063,12 @@ app.get('/api/meta/settings', requireAdmin, (req, res) => {
       lastCheckedAt: settings.lastCheckedAt,
       pageName: settings.pageName || null,
       timezone: settings.timezone || 'Asia/Dhaka',
-      graphApiVersion: META_GRAPH_VERSION
+      graphApiVersion: META_GRAPH_VERSION,
+      webhookConfig: {
+        endpoint: '/webhooks/instagram',
+        verifyTokenConfigured: Boolean(process.env.META_WEBHOOK_VERIFY_TOKEN && process.env.META_WEBHOOK_VERIFY_TOKEN.trim()),
+        appSecretConfigured: Boolean(process.env.META_APP_SECRET && process.env.META_APP_SECRET.trim())
+      }
     }
   });
 });
@@ -1349,6 +1380,202 @@ app.post('/api/campaigns/:id/publish', requireAdmin, async (req, res) => {
   }
 });
 
+// ----------------- INSTAGRAM WEBHOOK INTEGRATION -----------------
+// Cache of recently processed webhook event keys to prevent duplicate event processing
+const processedWebhookEvents = new Map(); // eventKey -> timestamp
+const WEBHOOK_EVENT_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+function recordAndCheckDuplicateEvent(eventKey) {
+  const now = Date.now();
+  // Periodically clean up expired event keys if the map exceeds 2,000 entries
+  if (processedWebhookEvents.size > 2000) {
+    for (const [key, timestamp] of processedWebhookEvents.entries()) {
+      if (now - timestamp > WEBHOOK_EVENT_TTL_MS) {
+        processedWebhookEvents.delete(key);
+      }
+    }
+  }
+
+  if (processedWebhookEvents.has(eventKey)) {
+    return true; // Duplicate detected
+  }
+
+  processedWebhookEvents.set(eventKey, now);
+  return false;
+}
+
+// 1. GET /webhooks/instagram — Meta Webhook Verification
+app.get('/webhooks/instagram', (req, res) => {
+  const mode = req.query['hub.mode'] || (req.query.hub && req.query.hub.mode);
+  const token = req.query['hub.verify_token'] || (req.query.hub && req.query.hub.verify_token);
+  const challenge = req.query['hub.challenge'] || (req.query.hub && req.query.hub.challenge);
+
+  // Read server-side verification token (never hardcoded, never exposed)
+  const configuredToken = (process.env.META_WEBHOOK_VERIFY_TOKEN || '').trim();
+
+  // Validate required parameters exist
+  if (!mode || !token || challenge === undefined) {
+    console.warn('[Webhook] Verification rejected: Missing required verification parameters in query.');
+    return res.status(403).send('Forbidden: Missing verification parameters');
+  }
+
+  // Reject if server verification token has not been configured
+  if (!configuredToken) {
+    console.warn('[Webhook] Verification rejected: META_WEBHOOK_VERIFY_TOKEN is not configured in server environment.');
+    return res.status(403).send('Forbidden: Webhook verify token not configured');
+  }
+
+  // Confirm mode is 'subscribe' and token matches securely using timing-safe comparison
+  const isValidMode = mode === 'subscribe';
+  const isTokenMatch = timingSafeCompare(String(token).trim(), configuredToken);
+
+  if (isValidMode && isTokenMatch) {
+    console.log('[Webhook] Instagram webhook verification successful.');
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    return res.status(200).send(String(challenge));
+  }
+
+  console.warn('[Webhook] Instagram webhook verification rejected: mode or token mismatch.');
+  return res.status(403).send('Forbidden: Verification failed');
+});
+
+// 2. POST /webhooks/instagram — Meta Event Notifications
+app.post('/webhooks/instagram', (req, res) => {
+  const signatureHeader = req.headers['x-hub-signature-256'];
+  const appSecret = (process.env.META_APP_SECRET || '').trim();
+
+  // Validate X-Hub-Signature-256 header exists and follows 'sha256=<hash>' format
+  if (!signatureHeader || typeof signatureHeader !== 'string' || !signatureHeader.startsWith('sha256=')) {
+    console.warn('[Webhook] Notification rejected: Missing or malformed X-Hub-Signature-256 header.');
+    return res.status(401).json({ error: 'Unauthorized: Missing or malformed X-Hub-Signature-256 header' });
+  }
+
+  // Reject if META_APP_SECRET is not configured
+  if (!appSecret) {
+    console.warn('[Webhook] Notification rejected: META_APP_SECRET is not configured in server environment.');
+    return res.status(401).json({ error: 'Unauthorized: META_APP_SECRET not configured' });
+  }
+
+  // Extract raw payload buffer for exact HMAC SHA-256 calculation
+  let rawBodyBuffer;
+  if (Buffer.isBuffer(req.body)) {
+    rawBodyBuffer = req.body;
+  } else if (Buffer.isBuffer(req.rawBody)) {
+    rawBodyBuffer = req.rawBody;
+  } else if (typeof req.body === 'string') {
+    rawBodyBuffer = Buffer.from(req.body, 'utf8');
+  } else if (req.body) {
+    rawBodyBuffer = Buffer.from(JSON.stringify(req.body), 'utf8');
+  } else {
+    rawBodyBuffer = Buffer.alloc(0);
+  }
+
+  const receivedSignature = signatureHeader.slice(7); // Remove 'sha256='
+  const expectedSignature = crypto
+    .createHmac('sha256', appSecret)
+    .update(rawBodyBuffer)
+    .digest('hex');
+
+  // Verify signature using timing-safe comparison
+  if (!timingSafeCompare(expectedSignature, receivedSignature)) {
+    console.warn('[Webhook] Notification rejected: X-Hub-Signature-256 signature mismatch.');
+    return res.status(401).json({ error: 'Unauthorized: Signature mismatch' });
+  }
+
+  // Parse JSON payload safely
+  let payload;
+  try {
+    if (Buffer.isBuffer(req.body)) {
+      payload = JSON.parse(req.body.toString('utf8'));
+    } else if (typeof req.body === 'object' && req.body !== null) {
+      payload = req.body;
+    } else {
+      payload = JSON.parse(rawBodyBuffer.toString('utf8') || '{}');
+    }
+  } catch (parseErr) {
+    console.warn('[Webhook] Notification rejected: Malformed JSON payload:', parseErr.message);
+    return res.status(400).json({ error: 'Bad Request: Malformed JSON payload' });
+  }
+
+  if (!payload || typeof payload !== 'object') {
+    return res.status(400).json({ error: 'Bad Request: Invalid payload structure' });
+  }
+
+  // Log useful event metadata without exposing any secrets, tokens, or PII
+  const objectType = payload.object || 'unknown';
+  const entries = Array.isArray(payload.entry) ? payload.entry : [];
+  let duplicateCount = 0;
+  let newEventsCount = 0;
+
+  for (const entry of entries) {
+    const entryId = entry.id || 'unknown';
+    const entryTime = entry.time || Math.floor(Date.now() / 1000);
+
+    if (Array.isArray(entry.changes)) {
+      for (const change of entry.changes) {
+        const field = change.field || 'unknown';
+        const changeId = change.value?.id || change.value?.media_id || change.value?.comment_id || 'item';
+        const eventKey = `${entryId}_${field}_${changeId}_${entryTime}`;
+
+        if (recordAndCheckDuplicateEvent(eventKey)) {
+          duplicateCount++;
+        } else {
+          newEventsCount++;
+          console.log(`[Webhook] Event processed: object=${objectType}, entryId=${entryId}, field=${field}, time=${entryTime}`);
+        }
+      }
+    } else if (Array.isArray(entry.messaging)) {
+      for (const msg of entry.messaging) {
+        const mid = msg.message?.mid || msg.timestamp || 'msg';
+        const eventKey = `${entryId}_messaging_${mid}`;
+
+        if (recordAndCheckDuplicateEvent(eventKey)) {
+          duplicateCount++;
+        } else {
+          newEventsCount++;
+          console.log(`[Webhook] Messaging event processed: object=${objectType}, entryId=${entryId}, timestamp=${msg.timestamp}`);
+        }
+      }
+    } else {
+      const eventKey = `${entryId}_${entryTime}`;
+      if (recordAndCheckDuplicateEvent(eventKey)) {
+        duplicateCount++;
+      } else {
+        newEventsCount++;
+        console.log(`[Webhook] General event processed: object=${objectType}, entryId=${entryId}, time=${entryTime}`);
+      }
+    }
+  }
+
+  // Promptly return HTTP 200 OK to acknowledge receipt to Meta
+  return res.status(200).json({
+    success: true,
+    object: objectType,
+    processedEvents: newEventsCount,
+    duplicateEvents: duplicateCount
+  });
+});
+
+// 3. GET /webhooks/instagram/status — Webhook Health & Readiness Check
+app.get('/webhooks/instagram/status', (req, res) => {
+  const hasVerifyToken = Boolean(process.env.META_WEBHOOK_VERIFY_TOKEN && process.env.META_WEBHOOK_VERIFY_TOKEN.trim());
+  const hasAppSecret = Boolean(process.env.META_APP_SECRET && process.env.META_APP_SECRET.trim());
+
+  return res.json({
+    status: hasVerifyToken && hasAppSecret ? 'ready' : 'pending_configuration',
+    endpoint: '/webhooks/instagram',
+    supportedMethods: ['GET (Meta Verification)', 'POST (Event Notifications)'],
+    metaGraphVersion: META_GRAPH_VERSION,
+    configuration: {
+      verifyTokenConfigured: hasVerifyToken,
+      appSecretConfigured: hasAppSecret
+    },
+    message: hasVerifyToken && hasAppSecret
+      ? 'Instagram webhook endpoint is active and configured to receive Meta events.'
+      : 'Instagram webhook endpoint is active. Configure META_WEBHOOK_VERIFY_TOKEN and META_APP_SECRET in Google Cloud Run to complete live setup.'
+  });
+});
+
 // Periodic background scheduler (checks every 60 seconds)
 setInterval(() => {
   try {
@@ -1374,9 +1601,9 @@ setInterval(() => {
 }, 60000);
 
 // ----------------- SECURE /admin ROUTE & WORKSPACE PROTECTION -----------------
-function serveAdminRoute(req, res) {
+async function serveAdminRoute(req, res) {
   const isProd = process.env.NODE_ENV === 'production';
-  const session = getActiveSession(req);
+  const session = await getActiveSessionAsync(req);
   if (session && session.isAdmin && isAuthorizedAdminEmail(session.email)) {
     // Authenticated administrator: serve full marketing workspace
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
@@ -1397,9 +1624,9 @@ function serveAdminRoute(req, res) {
 app.get(['/admin', '/admin/'], serveAdminRoute);
 
 // Protect direct access to admin.html as well (prevents bypassing /admin)
-app.get('/admin.html', (req, res) => {
+app.get('/admin.html', async (req, res) => {
   const isProd = process.env.NODE_ENV === 'production';
-  const session = getActiveSession(req);
+  const session = await getActiveSessionAsync(req);
   if (session && session.isAdmin && isAuthorizedAdminEmail(session.email)) {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
     const adminPath = isProd && fs.existsSync(path.join(__dirname, 'dist', 'admin.html'))
@@ -1413,6 +1640,7 @@ app.get('/admin.html', (req, res) => {
 // ----------------- VITE INTEGRATION -----------------
 async function startServer() {
   const isProd = process.env.NODE_ENV === 'production';
+  const httpServer = http.createServer(app);
 
   // Verify and sync persistent cloud storage on startup
   try {
@@ -1429,7 +1657,9 @@ async function startServer() {
         host: '0.0.0.0',
         port: PORT,
         allowedHosts: true,
-        hmr: process.env.DISABLE_HMR !== 'true',
+        hmr: {
+          server: httpServer
+        },
         watch: process.env.DISABLE_HMR === 'true' ? null : {}
       },
       appType: 'spa'
@@ -1443,7 +1673,7 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
+  httpServer.listen(PORT, '0.0.0.0', () => {
     console.log(`Little Big Help Server running at http://0.0.0.0:${PORT}`);
   });
 }
