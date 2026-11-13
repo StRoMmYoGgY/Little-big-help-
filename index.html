@@ -3,573 +3,1102 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="application-name" content="Little Big Help" />
-    <meta name="theme-color" content="#f7f5ee" />
+    <meta name="application-name" content="ALLORA" />
+    <meta name="theme-color" content="#172C27" />
     <meta
       name="description"
-      content="Everyday errands, local assistance, and practical support for your personal life or small business in Sylhet. Small tasks, big relief."
+      content="ALLORA is a professional personal concierge, local assistance in Sylhet, business solutions, and Bangladesh-wide digital solutions service. Transparent BDT pricing. Life, made lighter."
     />
 
-    <!-- Social Media Metadata (Open Graph & Twitter) -->
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="assets/images/allora-emblem.svg" />
+
+    <!-- Open Graph & Social Share Cards -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Little Big Help | Small Tasks, Big Relief" />
+    <meta property="og:site_name" content="ALLORA" />
+    <meta property="og:title" content="ALLORA — Life, made lighter." />
     <meta
       property="og:description"
-      content="Everyday errands, local assistance, and practical support for your personal life or small business. Tell us what you need, and we'll help you figure out the next step."
+      content="Personal concierge and local assistance in Sylhet, Business Solutions (starting from ৳10,000 BDT), and Digital Solutions across Bangladesh with transparent BDT pricing."
     />
-    <meta property="og:image" content="assets/images/interlocking-relief-social-tile.png" />
+    <meta property="og:image" content="src/assets/images/allora_hero_concierge_1794554875783.jpg" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="ALLORA — Life, made lighter." />
+    <meta
+      name="twitter:description"
+      content="Personal concierge, Sylhet local assistance, Business Solutions, and Bangladesh-wide Digital Solutions. Thoughtful assistance. Everyday convenience. Exceptional care."
+    />
 
-    <title>Little Big Help | Small Tasks, Big Relief</title>
-    
+    <title>ALLORA | Personal Concierge, Local Assistance, Business &amp; Digital Solutions — Life, made lighter.</title>
+
+    <!-- Editorial Typography: Cormorant Garamond + Manrope -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Manrope:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Schema.org Structured Data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "name": "ALLORA",
+        "slogan": "Life, made lighter.",
+        "description": "Personal concierge and local assistance in Sylhet, professional Business Solutions, and Bangladesh-wide Digital Solutions with transparent BDT pricing.",
+        "priceRange": "৳500 - ৳45,000+ BDT",
+        "areaServed": [
+          {
+            "@type": "City",
+            "name": "Sylhet"
+          },
+          {
+            "@type": "Country",
+            "name": "Bangladesh",
+            "description": "Digital Solutions available Bangladesh-wide; physical errands outside Sylhet subject to confirmed local partner availability."
+          }
+        ],
+        "telephone": "+8801865383565",
+        "email": "littlebighelp28@gmail.com",
+        "sameAs": [
+          "https://ig.me/m/littlebighelp28",
+          "https://m.me/61595733184255"
+        ]
+      }
+    </script>
+
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <!-- Subtle Theme-Color Ambient Background -->
-    <div class="bg-ambient-layer" aria-hidden="true">
-      <div class="ambient-orb ambient-orb-coral"></div>
-      <div class="ambient-orb ambient-orb-sage"></div>
-      <div class="ambient-orb ambient-orb-warm"></div>
-    </div>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
 
-    <!-- Site Navigation Header -->
+    <!-- Navigation Header (3-Zone Contract) -->
     <header class="site-header" id="top-header">
-      <nav class="navbar" aria-label="Main navigation">
-        <a href="#home" class="brand" aria-label="Little Big Help home">
+      <div class="container navbar">
+        <!-- Zone 1: Brand Wordmark -->
+        <a href="#home" class="brand" aria-label="ALLORA home">
           <img
-            src="assets/images/interlocking-relief-social-tile.png"
-            alt="Little Big Help emblem"
-            class="brand-logo"
-            width="40"
-            height="40"
+            src="assets/images/allora-emblem.svg"
+            alt="ALLORA crest"
+            class="brand-mark"
+            width="36"
+            height="36"
           />
-          <span class="brand-copy">
-            <span class="brand-text">Little Big Help</span>
-            <span class="brand-subtitle">Small Tasks, Big Relief</span>
-          </span>
+          <span class="brand-wordmark">ALLORA</span>
         </a>
 
-        <button
-          class="menu-toggle"
-          type="button"
-          aria-label="Toggle navigation menu"
-          aria-expanded="false"
-          aria-controls="nav-links"
-        >
-          <span class="menu-icon" aria-hidden="true">☰</span>
-        </button>
+        <!-- Zone 2: Navigation Links -->
+        <nav class="nav-drawer" id="primary-navigation" aria-label="Main navigation">
+          <ul class="nav-links">
+            <li><a href="#home" class="nav-item">Home</a></li>
+            <li><a href="#services" class="nav-item">Services</a></li>
+            <li><a href="#pricing" class="nav-item">Pricing</a></li>
+            <li><a href="#how-it-works" class="nav-item">How It Works</a></li>
+            <li><a href="#about" class="nav-item">About</a></li>
+            <li><a href="#contact" class="nav-item">Contact</a></li>
+          </ul>
+          <div class="nav-mobile-footer">
+            <a href="#contact" class="btn btn-primary btn-full mobile-cta-link">Get Assistance</a>
+          </div>
+        </nav>
 
-        <!-- Desktop Navigation: Services, How It Works, Contact -->
-        <ul class="nav-links" id="nav-links">
-          <li><a href="#services" class="nav-item">Services</a></li>
-          <li><a href="#how-it-works" class="nav-item">How It Works</a></li>
-          <li><a href="#contact" class="nav-item">Contact</a></li>
-          <li class="nav-mobile-cta">
-            <a
-              href="https://wa.me/8801865383565?text=Hello%20Little%20Big%20Help%2C%20I%20would%20like%20to%20inquire%20about%20your%20services."
-              class="mobile-whatsapp-btn"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Chat on WhatsApp"
-            >
-              Chat on WhatsApp
-            </a>
-          </li>
-        </ul>
-
-        <!-- Prominent WhatsApp CTA on desktop -->
-        <a
-          href="https://wa.me/8801865383565?text=Hello%20Little%20Big%20Help%2C%20I%20would%20like%20to%20inquire%20about%20your%20services."
-          class="header-whatsapp-cta"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Chat with Little Big Help on WhatsApp"
-        >
-          <svg class="cta-wa-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M20.52 3.48A11.93 11.93 0 0 0 12.2 1C6.64 1 2.1 5.54 2.1 11.1c0 1.95.52 3.86 1.5 5.54L2 22l5.5-1.57a10.1 10.1 0 0 0 4.7 1.38h.01c5.56 0 10.1-4.54 10.1-10.1 0-2.7-1.05-5.24-2.79-7.23ZM12.2 18.28h-.01a8.38 8.38 0 0 1-4.27-1.17l-.31-.18-3.27.94.87-3.18-.2-.33A8.38 8.38 0 1 1 12.2 18.28Zm4.6-6.24c-.25-.13-1.47-.72-1.7-.81-.23-.08-.4-.13-.57.13-.17.25-.65.81-.8 1-.15.17-.3.19-.55.06-.25-.13-1.05-.39-2-1.25-.74-.66-1.24-1.47-1.39-1.72-.15-.25-.02-.39.11-.52.11-.11.25-.3.38-.45.13-.15.17-.26.25-.43.08-.17.04-.32-.02-.45-.06-.13-.57-1.37-.78-1.88-.21-.51-.42-.44-.57-.45h-.49c-.17 0-.45.06-.68.32-.23.25-.88.86-.88 2.11s.9 2.44.99 2.61c.09.17 1.75 2.63 4.22 3.63.59.25 1.04.4 1.4.5.59.19 1.13.16 1.55.1.47-.07 1.47-.6 1.68-1.18.21-.58.21-1.08.15-1.18-.06-.1-.22-.16-.47-.29Z" />
-          </svg>
-          Chat on WhatsApp
-        </a>
-      </nav>
+        <!-- Zone 3: Single Primary Action + Mobile Toggle -->
+        <div class="header-actions">
+          <a href="#contact" class="btn btn-primary header-cta">Get Assistance</a>
+          <button
+            class="menu-toggle"
+            type="button"
+            aria-label="Open navigation menu"
+            aria-expanded="false"
+            aria-controls="primary-navigation"
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+              <line x1="4" y1="7" x2="20" y2="7" />
+              <line x1="4" y1="12" x2="20" y2="12" />
+              <line x1="4" y1="17" x2="20" y2="17" />
+            </svg>
+          </button>
+        </div>
+      </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="page-main">
+    <main id="main-content">
       <!-- Hero Section -->
-      <section class="hero" id="home" aria-labelledby="hero-title">
-        <div class="hero-content reveal reveal-up">
-          <div class="hero-badge">
-            <span class="badge-dot" aria-hidden="true"></span>
-            <span>Little Big Help • Small Tasks, Big Relief</span>
+      <section class="hero-section" id="home" aria-labelledby="hero-headline">
+        <div class="container hero-grid">
+          <div class="hero-copy">
+            <p class="eyebrow">Sylhet Physical Operations &middot; Bangladesh-Wide Digital Solutions</p>
+            <h1 id="hero-headline" class="hero-title">
+              Your day, handled with care.
+            </h1>
+            <p class="hero-subtitle">
+              Professional personal concierge, Sylhet local assistance, scoped Business Solutions, and custom Digital Solutions—organised, transparent, and built around your schedule.
+            </p>
+
+            <div class="hero-actions">
+              <a href="#contact" class="btn btn-primary">Request Assistance</a>
+              <a href="#pricing" class="btn btn-secondary">View BDT Pricing</a>
+            </div>
+
+            <div class="hero-statement">
+              <span class="hero-tagline">Life, made lighter.</span>
+              <span class="hero-sep" aria-hidden="true">&middot;</span>
+              <span class="hero-supporting">Thoughtful assistance. Everyday convenience. Exceptional care.</span>
+            </div>
           </div>
 
-          <h1 id="hero-title" class="hero-title">
-            Life gets busy.<br />
-            <span class="hero-highlight">We've got a hand to lend.</span>
-          </h1>
-
-          <p class="hero-description">
-            Everyday errands, local assistance, professional websites, and practical support for your personal life or small business.
-            Tell us what you need, and we'll help you figure out the next step.
-          </p>
-
-          <div class="hero-actions">
-            <a
-              href="https://wa.me/8801865383565?text=Hello%20Little%20Big%20Help%2C%20I%20would%20like%20to%20inquire%20about%20your%20services."
-              class="button button-whatsapp"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Chat on WhatsApp with Little Big Help"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path d="M20.52 3.48A11.93 11.93 0 0 0 12.2 1C6.64 1 2.1 5.54 2.1 11.1c0 1.95.52 3.86 1.5 5.54L2 22l5.5-1.57a10.1 10.1 0 0 0 4.7 1.38h.01c5.56 0 10.1-4.54 10.1-10.1 0-2.7-1.05-5.24-2.79-7.23ZM12.2 18.28h-.01a8.38 8.38 0 0 1-4.27-1.17l-.31-.18-3.27.94.87-3.18-.2-.33A8.38 8.38 0 1 1 12.2 18.28Zm4.6-6.24c-.25-.13-1.47-.72-1.7-.81-.23-.08-.4-.13-.57.13-.17.25-.65.81-.8 1-.15.17-.3.19-.55.06-.25-.13-1.05-.39-2-1.25-.74-.66-1.24-1.47-1.39-1.72-.15-.25-.02-.39.11-.52.11-.11.25-.3.38-.45.13-.15.17-.26.25-.43.08-.17.04-.32-.02-.45-.06-.13-.57-1.37-.78-1.88-.21-.51-.42-.44-.57-.45h-.49c-.17 0-.45.06-.68.32-.23.25-.88.86-.88 2.11s.9 2.44.99 2.61c.09.17 1.75 2.63 4.22 3.63.59.25 1.04.4 1.4.5.59.19 1.13.16 1.55.1.47-.07 1.47-.6 1.68-1.18.21-.58.21-1.08.15-1.18-.06-.1-.22-.16-.47-.29Z" />
-              </svg>
-              <span>Chat on WhatsApp</span>
-            </a>
-            <a href="#services" class="button button-outline">
-              <span>Explore Services</span>
-            </a>
-          </div>
-
-          <div class="hero-trust">
-            <span class="trust-item">✦ Local & Trusted</span>
-            <span class="trust-item">✦ Transparent Pricing</span>
-            <span class="trust-item">✦ Friendly Support</span>
+          <div class="hero-media">
+            <figure class="hero-figure fallback-surface">
+              <img
+                src="src/assets/images/allora_hero_concierge_1794554875783.jpg"
+                alt="Sunlit concierge lounge featuring warm ivory linen seating, deep forest green paneling, fresh white botanicals, and a neatly wrapped parcel tied with champagne ribbon"
+                class="hero-img"
+                width="1280"
+                height="720"
+                referrerPolicy="no-referrer"
+              />
+              <figcaption class="hero-caption">
+                <span>Sylhet Headquarters</span>
+                <span aria-hidden="true">&middot;</span>
+                <span>All Pricing in BDT (৳)</span>
+              </figcaption>
+            </figure>
           </div>
         </div>
+      </section>
 
-        <div class="hero-visual reveal reveal-scale" aria-hidden="true">
-          <div class="visual-card">
-            <div class="visual-orbit visual-orbit-coral"></div>
-            <div class="visual-orbit visual-orbit-sage"></div>
-            
-            <div class="visual-emblem">
-              <img
-                src="assets/images/interlocking-relief-social-tile.png"
-                alt=""
-                class="visual-emblem-img"
-                width="140"
-                height="140"
-              />
-            </div>
-
-            <div class="visual-chip visual-chip-left">
-              <span>Small Tasks</span>
-            </div>
-            <div class="visual-chip visual-chip-right">
-              <span>Big Relief</span>
-            </div>
+      <!-- Trust & Coverage Band -->
+      <section class="trust-band" aria-label="Core operating standards and coverage">
+        <div class="container">
+          <div class="trust-grid">
+            <article class="trust-pillar">
+              <span class="pillar-num">01</span>
+              <h2 class="pillar-title">Confirmed Before Starting</h2>
+              <p class="pillar-text">Every task starts only after we confirm availability, number of stops, timeline, and written BDT quotation.</p>
+            </article>
+            <article class="trust-pillar">
+              <span class="pillar-num">02</span>
+              <h2 class="pillar-title">Separated Expenses</h2>
+              <p class="pillar-text">Service fees, actual transportation, customer purchases, and third-party costs are quoted separately—never hidden.</p>
+            </article>
+            <article class="trust-pillar">
+              <span class="pillar-num">03</span>
+              <h2 class="pillar-title">Honest Service Coverage</h2>
+              <p class="pillar-text">Physical errands &amp; local support operate in Sylhet; Digital Solutions serve all of Bangladesh; Business Solutions match confirmed capacity.</p>
+            </article>
+            <article class="trust-pillar">
+              <span class="pillar-num">04</span>
+              <h2 class="pillar-title">Receipts &amp; Reconciliation</h2>
+              <p class="pillar-text">Receive task progress updates, original expense receipts, and prompt return or credit of any unused advance funds.</p>
+            </article>
           </div>
         </div>
       </section>
 
       <!-- Services Section -->
-      <section class="services section" id="services" aria-labelledby="services-title">
-        <div class="section-heading reveal reveal-up">
-          <span class="eyebrow">Our Services</span>
-          <h2 id="services-title">How can we help?</h2>
-          <p>
-            From everyday errands to small business tasks, tell us what you need help with.
-            We'll discuss the details, confirm availability and agree on the price before getting started.
-          </p>
-        </div>
-
-        <div class="services-grid">
-          <!-- 1. Everyday Help (Coral Accent) -->
-          <article class="service-card service-accent-coral reveal reveal-up">
-            <div class="service-top">
-              <div class="service-icon-box" aria-hidden="true">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-                  <line x1="3" y1="6" x2="21" y2="6"/>
-                  <path d="M16 10a4 4 0 0 1-8 0"/>
-                </svg>
-              </div>
-              <span class="service-badge">Daily Relief</span>
+      <section class="services-section section" id="services" aria-labelledby="services-heading">
+        <div class="container">
+          <div class="section-header-split">
+            <div>
+              <p class="eyebrow">Four Dedicated Pillars</p>
+              <h2 id="services-heading" class="section-title">Services structured around clear scope.</h2>
             </div>
-            <h3>Everyday Help</h3>
-            <p>
-              Errands, shopping and everyday tasks. Practical assistance with household organization,
-              deliveries, and the essential things that tend to pile up.
+            <p class="section-lead">
+              Whether saving time on daily errands in Sylhet, verifying a local venue, scaling business operations, or building your digital presence across Bangladesh, choose the exact support you need.
             </p>
-            <div class="service-footer">
-              <a
-                href="https://wa.me/8801865383565?text=Hi%20Little%20Big%20Help%2C%20I'd%20like%20to%20ask%20about%20Everyday%20Help%20(errands%2C%20shopping%20and%20daily%20tasks)."
-                class="service-cta-link"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <span>Ask about this on WhatsApp</span>
-                <span class="cta-arrow" aria-hidden="true">&rarr;</span>
-              </a>
-            </div>
-          </article>
+          </div>
 
-          <!-- 2. Local Assistance (Sage Accent) -->
-          <article class="service-card service-accent-sage reveal reveal-up reveal-delay-1">
-            <div class="service-top">
-              <div class="service-icon-box" aria-hidden="true">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"/>
-                  <circle cx="12" cy="10" r="3"/>
-                </svg>
-              </div>
-              <span class="service-badge">Sylhet & Surrounds</span>
-            </div>
-            <h3>Local Assistance</h3>
-            <p>
-              Local recommendations, pickups and practical help around Sylhet. Connecting you with trusted
-              local services and on-the-ground support without the stress.
-            </p>
-            <div class="service-footer">
-              <a
-                href="https://wa.me/8801865383565?text=Hi%20Little%20Big%20Help%2C%20I'd%20like%20to%20ask%20about%20Local%20Assistance%20around%20Sylhet."
-                class="service-cta-link"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <span>Ask about this on WhatsApp</span>
-                <span class="cta-arrow" aria-hidden="true">&rarr;</span>
-              </a>
-            </div>
-          </article>
+          <!-- Interactive Category Filter Tabs -->
+          <div class="service-filters" role="tablist" aria-label="Filter services by category">
+            <button type="button" class="filter-tab is-active" data-filter="all" role="tab" aria-selected="true">All Services</button>
+            <button type="button" class="filter-tab" data-filter="Personal Concierge" role="tab" aria-selected="false">Personal Concierge</button>
+            <button type="button" class="filter-tab" data-filter="Local Assistance" role="tab" aria-selected="false">Local Assistance</button>
+            <button type="button" class="filter-tab" data-filter="Business Solutions" role="tab" aria-selected="false">Business Solutions</button>
+            <button type="button" class="filter-tab" data-filter="Digital Solutions" role="tab" aria-selected="false">Digital Solutions</button>
+          </div>
 
-          <!-- 3. Business Support (Amber Accent) -->
-          <article class="service-card service-accent-amber reveal reveal-up reveal-delay-2">
-            <div class="service-top">
-              <div class="service-icon-box" aria-hidden="true">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
-                  <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-                </svg>
+          <div class="services-grid" id="services-grid">
+            <!-- 1. Personal Concierge -->
+            <article class="service-card" data-category="Personal Concierge">
+              <div class="service-media fallback-surface">
+                <img
+                  src="src/assets/images/allora_personal_concierge_1794554876752.jpg"
+                  alt="Woven linen tote with fresh white flowers beside a champagne-ribboned gift parcel on travertine stone"
+                  class="service-img"
+                  width="800"
+                  height="600"
+                  loading="lazy"
+                  referrerPolicy="no-referrer"
+                />
               </div>
-              <span class="service-badge">Extra Capacity</span>
-            </div>
-            <h3>Business Support</h3>
-            <p>
-              Pickups, coordination, basic admin tasks and day-to-day errands. Reliable extra hands for
-              small businesses, solo entrepreneurs, and busy professionals.
-            </p>
-            <div class="service-footer">
-              <a
-                href="https://wa.me/8801865383565?text=Hi%20Little%20Big%20Help%2C%20I'd%20like%20to%20ask%20about%20Business%20Support%20services."
-                class="service-cta-link"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <span>Ask about this on WhatsApp</span>
-                <span class="cta-arrow" aria-hidden="true">&rarr;</span>
-              </a>
-            </div>
-          </article>
+              <div class="service-body">
+                <div class="service-header-line">
+                  <p class="service-meta">01 &middot; Sylhet (Subject to Availability)</p>
+                  <span class="service-rate-hint">From ৳500 BDT</span>
+                </div>
+                <h3 class="service-title">Personal Concierge</h3>
+                <p class="service-desc">
+                  Save time across everyday errands, shopping, pickups, pharmacy collections, bookings, and thoughtful personal requests.
+                </p>
+                <ul class="service-list">
+                  <li>Grocery and shopping assistance</li>
+                  <li>Restaurant and food pickups</li>
+                  <li>Product collection and delivery coordination</li>
+                  <li>Pharmacy and medicine collection</li>
+                  <li>Gift and flower arrangements</li>
+                  <li>Personal purchases and collections</li>
+                  <li>Appointment and booking coordination</li>
+                  <li>Other reasonable personal errands</li>
+                </ul>
+                <div class="service-footer">
+                  <a href="#pricing" class="service-pricing-link" data-view-pricing="Personal Concierge">See Concierge Rates</a>
+                  <button type="button" class="service-inquire-btn" data-select-service="Personal Concierge">
+                    <span>Inquire about Personal Concierge</span>
+                    <span aria-hidden="true">&rarr;</span>
+                  </button>
+                </div>
+              </div>
+            </article>
 
-          <!-- 4. Website Design & Development (Cyan Accent) -->
-          <article class="service-card service-accent-cyan reveal reveal-up reveal-delay-3">
-            <div class="service-top">
-              <div class="service-icon-box" aria-hidden="true">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
-                  <line x1="8" y1="21" x2="16" y2="21"/>
-                  <line x1="12" y1="17" x2="12" y2="21"/>
-                </svg>
+            <!-- 2. Local Assistance -->
+            <article class="service-card" data-category="Local Assistance">
+              <div class="service-media fallback-surface">
+                <img
+                  src="src/assets/images/allora_local_sylhet_1794554877059.jpg"
+                  alt="Misty morning tea hills and serene stone pathway in Sylhet, Bangladesh"
+                  class="service-img"
+                  width="800"
+                  height="600"
+                  loading="lazy"
+                  referrerPolicy="no-referrer"
+                />
               </div>
-              <span class="service-badge">Web &amp; Digital</span>
-            </div>
-            <h3>Website Design &amp; Development</h3>
-            <p>
-              Professional websites for small businesses, local shops, service providers and entrepreneurs. We build websites tailored to your brand and business needs, helping you establish a professional online presence.
-            </p>
-            <div class="service-optional-box">
-              <strong>Website Maintenance (Optional):</strong>
-              <span>Need help after launch? Ongoing website updates, content changes and maintenance can be arranged separately if required.</span>
-            </div>
-            <div class="service-footer">
-              <a
-                href="https://wa.me/8801865383565?text=Hi%20Little%20Big%20Help%2C%20I'm%20interested%20in%20your%20website%20design%20and%20development%20services.%20I'd%20like%20to%20discuss%20my%20project."
-                class="service-cta-link"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <span>Discuss Your Website Project</span>
-                <span class="cta-arrow" aria-hidden="true">&rarr;</span>
-              </a>
-            </div>
-          </article>
+              <div class="service-body">
+                <div class="service-header-line">
+                  <p class="service-meta">02 &middot; Sylhet Local Knowledge &amp; Verification</p>
+                  <span class="service-rate-hint">From ৳500 BDT</span>
+                </div>
+                <h3 class="service-title">Local Assistance</h3>
+                <p class="service-desc">
+                  On-the-ground local knowledge, location verification, visitor guidance, and practical coordination in Sylhet—separate from everyday errands.
+                </p>
+                <ul class="service-list">
+                  <li>Location and address verification</li>
+                  <li>Local information and guidance</li>
+                  <li>Tourist assistance and visitor practical support</li>
+                  <li>Restaurant and venue coordination</li>
+                  <li>Local shopping guidance</li>
+                  <li>Appointment and service coordination</li>
+                  <li>Transport arrangement assistance</li>
+                  <li>Local collection and delivery coordination</li>
+                </ul>
+                <div class="service-footer">
+                  <a href="#pricing" class="service-pricing-link" data-view-pricing="Local Assistance">See Local Assistance &amp; Add-ons</a>
+                  <button type="button" class="service-inquire-btn" data-select-service="Local Assistance">
+                    <span>Inquire about Local Assistance</span>
+                    <span aria-hidden="true">&rarr;</span>
+                  </button>
+                </div>
+              </div>
+            </article>
 
-          <!-- 5. Custom Requests (Turquoise Accent) -->
-          <article class="service-card service-accent-turquoise reveal reveal-up reveal-delay-4">
-            <div class="service-top">
-              <div class="service-icon-box" aria-hidden="true">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="10"/>
-                  <path d="M12 8v8"/>
-                  <path d="M8 12h8"/>
-                </svg>
+            <!-- 3. Business Solutions -->
+            <article class="service-card" data-category="Business Solutions">
+              <div class="service-media service-media-editorial">
+                <div class="editorial-panel">
+                  <span class="editorial-panel-kicker">Structured Business Support &middot; Min. ৳10,000 BDT</span>
+                  <p class="editorial-panel-quote">Defined operational, administrative, customer service, and management capacity.</p>
+                </div>
               </div>
-              <span class="service-badge">Flexible</span>
-            </div>
-            <h3>Custom Requests</h3>
-            <p>
-              Individual requests that can be discussed and assessed. Have a unique chore or one-off task?
-              Let us know what you have in mind and we'll evaluate how to help.
-            </p>
-            <div class="service-footer">
-              <a
-                href="https://wa.me/8801865383565?text=Hi%20Little%20Big%20Help%2C%20I%20have%20a%20custom%20request%20I'd%20like%20to%20discuss."
-                class="service-cta-link"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <span>Discuss your request on WhatsApp</span>
-                <span class="cta-arrow" aria-hidden="true">&rarr;</span>
-              </a>
-            </div>
-          </article>
+              <div class="service-body">
+                <div class="service-header-line">
+                  <p class="service-meta">03 &middot; Professional Engagement</p>
+                  <span class="service-rate-hint">Starting ৳10,000 BDT</span>
+                </div>
+                <h3 class="service-title">Business Solutions</h3>
+                <p class="service-desc">
+                  Structured professional business capacity priced around defined deliverables, hours, and responsibilities—never a casual errand service.
+                </p>
+                <ul class="service-list">
+                  <li><strong>Business Operations:</strong> Operational coordination, vendor follow-ups, daily logistics &amp; stock tracking</li>
+                  <li><strong>Administrative Support:</strong> Record organisation, documentation preparation, reports &amp; scheduling</li>
+                  <li><strong>Customer Service:</strong> Inquiry response, complaint follow-ups, order &amp; appointment coordination</li>
+                  <li><strong>Business Coordination:</strong> Task delegation tracking, team follow-ups &amp; on-site business errands</li>
+                  <li><strong>Business Development:</strong> Lead research, outreach tracking, partner coordination &amp; expansion prep</li>
+                </ul>
+                <div class="service-footer">
+                  <a href="#pricing" class="service-pricing-link" data-view-pricing="Business Solutions">See Business Solutions Pricing</a>
+                  <button type="button" class="service-inquire-btn" data-select-service="Business Solutions">
+                    <span>Request Business Consultation</span>
+                    <span aria-hidden="true">&rarr;</span>
+                  </button>
+                </div>
+              </div>
+            </article>
+
+            <!-- 4. Digital Solutions -->
+            <article class="service-card" data-category="Digital Solutions">
+              <div class="service-media fallback-surface">
+                <img
+                  src="src/assets/images/allora_business_digital_1794554877164.jpg"
+                  alt="Minimalist walnut and travertine executive workspace with sleek laptop and linen notebook"
+                  class="service-img"
+                  width="800"
+                  height="600"
+                  loading="lazy"
+                  referrerPolicy="no-referrer"
+                />
+              </div>
+              <div class="service-body">
+                <div class="service-header-line">
+                  <p class="service-meta">04 &middot; Available Bangladesh-Wide</p>
+                  <span class="service-rate-hint">Consultation from ৳1,500</span>
+                </div>
+                <h3 class="service-title">Digital Solutions</h3>
+                <p class="service-desc">
+                  Consultation-based custom websites (৳10,000–৳45,000 BDT), social media management, business digital setup, and structured technical support.
+                </p>
+                <ul class="service-list">
+                  <li><strong>Website Design &amp; Development:</strong> Custom consultation-led sites (৳10,000–৳45,000 BDT; 60/40 terms)</li>
+                  <li><strong>Social Media Services:</strong> Account setup, brand optimisation, content creation &amp; monthly management</li>
+                  <li><strong>Business Digital Setup:</strong> Business email, Google Business Profile &amp; WhatsApp Business setup</li>
+                  <li><strong>Website &amp; Technical Support:</strong> Content updates, troubleshooting &amp; monthly maintenance plans</li>
+                  <li><strong>Paid Digital Consultation:</strong> Strategy, scope &amp; technical roadmap starting from ৳1,500 BDT</li>
+                </ul>
+                <div class="service-footer">
+                  <a href="#pricing" class="service-pricing-link" data-view-pricing="Digital Solutions">See Digital Schedule</a>
+                  <button type="button" class="service-inquire-btn" data-select-service="Digital Solutions">
+                    <span>Inquire about Digital Solutions</span>
+                    <span aria-hidden="true">&rarr;</span>
+                  </button>
+                </div>
+              </div>
+            </article>
+          </div>
         </div>
       </section>
 
-      <!-- How It Works Section (Compact 3-Step Section without Large Numbered Boxes) -->
-      <section class="how-it-works section" id="how-it-works" aria-labelledby="steps-title">
-        <div class="section-heading reveal reveal-up">
-          <span class="eyebrow">Simple & Transparent</span>
-          <h2 id="steps-title">How It Works</h2>
-          <p>Getting dependable help is straightforward. No hidden fees, no unnecessary fuss.</p>
-        </div>
-
-        <div class="steps-flow">
-          <!-- Step 1 -->
-          <div class="step-item reveal reveal-up">
-            <div class="step-icon-wrap" aria-hidden="true">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-              </svg>
+      <!-- Comprehensive Operations & BDT Pricing Section -->
+      <section class="pricing-section section" id="pricing" aria-labelledby="pricing-heading">
+        <div class="container">
+          <div class="section-header-split">
+            <div>
+              <p class="eyebrow">Operations &amp; Pricing Blueprint</p>
+              <h2 id="pricing-heading" class="section-title">Transparent BDT Pricing &amp; Operating Terms.</h2>
             </div>
-            <div class="step-body">
-              <h3>Tell us what you need.</h3>
-              <p>Share a quick message about your task, local errand, or website project with scope, location and timing.</p>
-            </div>
-          </div>
-
-          <!-- Step 2 -->
-          <div class="step-item reveal reveal-up reveal-delay-1">
-            <div class="step-icon-wrap" aria-hidden="true">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                <line x1="16" y1="2" x2="16" y2="6"/>
-                <line x1="8" y1="2" x2="8" y2="6"/>
-                <line x1="3" y1="10" x2="21" y2="10"/>
-                <path d="m9 16 2 2 4-4"/>
-              </svg>
-            </div>
-            <div class="step-body">
-              <h3>Confirm the details, availability and pricing.</h3>
-              <p>We'll discuss your requirements, confirm our availability, schedule and project scope, and agree on a transparent price upfront.</p>
-            </div>
-          </div>
-
-          <!-- Step 3 -->
-          <div class="step-item reveal reveal-up reveal-delay-2">
-            <div class="step-icon-wrap" aria-hidden="true">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                <polyline points="22 4 12 14.01 9 11.01"/>
-              </svg>
-            </div>
-            <div class="step-body">
-              <h3>Arrange the service once everything is agreed.</h3>
-              <p>Once confirmed, we handle the work with care and dependability—with tailored milestones for website builds and prompt execution for daily tasks.</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="workflow-scope-note reveal reveal-up">
-          <p>
-            <strong>Note on workflows:</strong> Delivery timelines, scopes, and milestones are tailored individually depending on whether you need everyday local assistance or a full website project.
-          </p>
-        </div>
-      </section>
-
-      <!-- Contact Section -->
-      <section class="contact section" id="contact" aria-labelledby="contact-title">
-        <div class="contact-card reveal reveal-up">
-          <div class="contact-header">
-            <span class="eyebrow">Get In Touch</span>
-            <h2 id="contact-title">Let's Talk About What You Need</h2>
-            <p>
-              Have a task in mind? Message us with the details, and we'll get back to you to discuss availability and pricing.
+            <p class="section-lead">
+              Every engagement is quoted clearly in Bangladeshi Taka (BDT / ৳) before work starts. Select a service category below to inspect service fees, additional charges, and operating policies.
             </p>
           </div>
 
-          <!-- Interactive Task & Project Request Form -->
-          <form class="request-form" id="service-request-form" novalidate>
-            <div class="form-intro">
-              <span class="form-title">Send a Service or Project Request</span>
-              <p>Select your category below. You can send your inquiry straight to our official WhatsApp chat.</p>
-            </div>
-
-            <div class="form-grid">
-              <div class="form-field">
-                <label for="form-service">Service Category</label>
-                <select id="form-service" name="service" class="form-control form-select">
-                  <option value="Everyday Help">Everyday Help (Errands, shopping &amp; daily tasks)</option>
-                  <option value="Local Assistance">Local Assistance (Sylhet pickups &amp; local help)</option>
-                  <option value="Business Support">Business Support (Admin, pickups &amp; coordination)</option>
-                  <option value="Website Design &amp; Development">Website Design &amp; Development</option>
-                  <option value="Custom Requests">Custom Requests (Individual tasks)</option>
-                </select>
-              </div>
-
-              <div class="form-field">
-                <label for="form-name">Your Name</label>
-                <input type="text" id="form-name" name="name" class="form-control" placeholder="Your name or business name" />
-              </div>
-            </div>
-
-            <!-- Website Design & Development Specific Conditional Fields -->
-            <div class="website-enquiry-fields" id="website-enquiry-fields" style="display: none;">
-              <div class="form-grid">
-                <div class="form-field">
-                  <label for="form-biz-name">Business Name <span class="field-optional">(Optional)</span></label>
-                  <input type="text" id="form-biz-name" name="business_name" class="form-control" placeholder="e.g. Sylhet Artisan Cafe" />
-                </div>
-
-                <div class="form-field">
-                  <label for="form-website-url">Existing Website URL <span class="field-optional">(Optional, if any)</span></label>
-                  <input type="url" id="form-website-url" name="existing_website" class="form-control" placeholder="e.g. https://mybusiness.com" />
-                </div>
-              </div>
-
-              <div class="form-field">
-                <label for="form-website-type">Type of Website or Requested Changes</label>
-                <input type="text" id="form-website-type" name="website_type" class="form-control" placeholder="e.g. New business site, service portfolio, shop, redesign..." />
-              </div>
-
-              <div class="form-field form-checkbox-field">
-                <label class="checkbox-container">
-                  <input type="checkbox" id="form-maintenance" name="maintenance" />
-                  <span class="checkbox-label">Include ongoing website maintenance &amp; content updates (Optional)</span>
-                </label>
-              </div>
-            </div>
-
-            <div class="form-field">
-              <label for="form-details">Task / Project Details</label>
-              <textarea id="form-details" name="details" class="form-control form-textarea" rows="3" placeholder="Share a few details about what you need done, timelines, and any preferences..."></textarea>
-            </div>
-
-            <div class="form-actions">
-              <button type="submit" class="button button-whatsapp form-btn-submit">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                  <path d="M20.52 3.48A11.93 11.93 0 0 0 12.2 1C6.64 1 2.1 5.54 2.1 11.1c0 1.95.52 3.86 1.5 5.54L2 22l5.5-1.57a10.1 10.1 0 0 0 4.7 1.38h.01c5.56 0 10.1-4.54 10.1-10.1 0-2.7-1.05-5.24-2.79-7.23ZM12.2 18.28h-.01a8.38 8.38 0 0 1-4.27-1.17l-.31-.18-3.27.94.87-3.18-.2-.33A8.38 8.38 0 1 1 12.2 18.28Zm4.6-6.24c-.25-.13-1.47-.72-1.7-.81-.23-.08-.4-.13-.57.13-.17.25-.65.81-.8 1-.15.17-.3.19-.55.06-.25-.13-1.05-.39-2-1.25-.74-.66-1.24-1.47-1.39-1.72-.15-.25-.02-.39.11-.52.11-.11.25-.3.38-.45.13-.15.17-.26.25-.43.08-.17.04-.32-.02-.45-.06-.13-.57-1.37-.78-1.88-.21-.51-.42-.44-.57-.45h-.49c-.17 0-.45.06-.68.32-.23.25-.88.86-.88 2.11s.9 2.44.99 2.61c.09.17 1.75 2.63 4.22 3.63.59.25 1.04.4 1.4.5.59.19 1.13.16 1.55.1.47-.07 1.47-.6 1.68-1.18.21-.58.21-1.08.15-1.18-.06-.1-.22-.16-.47-.29Z" />
-                </svg>
-                <span>Send Request via WhatsApp</span>
-                <span class="cta-arrow" aria-hidden="true">&rarr;</span>
-              </button>
-            </div>
-          </form>
-
-          <div class="contact-channels-heading">
-            <span class="channels-title">Or Connect Directly</span>
-            <span class="channels-line"></span>
+          <!-- Interactive Pricing Category Tabs -->
+          <div class="pricing-tabs" role="tablist" aria-label="Select pricing category">
+            <button type="button" class="pricing-tab is-active" data-pricing-tab="Personal Concierge" role="tab" aria-selected="true">
+              <span class="ptab-title">Personal Concierge</span>
+              <span class="ptab-sub">Starting ৳500 BDT</span>
+            </button>
+            <button type="button" class="pricing-tab" data-pricing-tab="Local Assistance" role="tab" aria-selected="false">
+              <span class="ptab-title">Local Assistance</span>
+              <span class="ptab-sub">Starting ৳500 BDT</span>
+            </button>
+            <button type="button" class="pricing-tab" data-pricing-tab="Business Solutions" role="tab" aria-selected="false">
+              <span class="ptab-title">Business Solutions</span>
+              <span class="ptab-sub">Min. ৳10,000 BDT</span>
+            </button>
+            <button type="button" class="pricing-tab" data-pricing-tab="Digital Solutions" role="tab" aria-selected="false">
+              <span class="ptab-title">Digital Solutions</span>
+              <span class="ptab-sub">Bangladesh-Wide</span>
+            </button>
           </div>
 
-          <!-- Clean Clickable Contact Channels (Entire Card Area Clickable) -->
-          <div class="contact-list" aria-label="Contact Channels">
-            <!-- 1. WhatsApp Business DM -->
-            <a
-              class="contact-item contact-item-wa"
-              href="https://wa.me/8801865383565?text=Hi%20Little%20Big%20Help%2C%20I%20have%20a%20task%20in%20mind%20and%20would%20like%20to%20discuss%20details."
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Chat on WhatsApp: 01865383565"
-            >
-              <div class="contact-icon-frame" aria-hidden="true">
-                <img src="assets/images/logo-whatsapp.svg" alt="" width="32" height="32" />
+          <!-- Panel 1: Personal Concierge -->
+          <div class="pricing-panel" data-pricing-panel="Personal Concierge">
+            <div class="pricing-panel-grid">
+              <div class="pricing-table-card">
+                <div class="pricing-card-head">
+                  <div>
+                    <p class="pricing-kicker">Category 01 &middot; Sylhet Physical Concierge</p>
+                    <h3>Personal Concierge Service Fees</h3>
+                  </div>
+                  <span class="pricing-pill-note">Service Fee Only</span>
+                </div>
+                <table class="rate-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Service Level</th>
+                      <th scope="col" class="num-col">Service Fee (BDT)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Simple single-stop errand</td>
+                      <td class="num-col">৳500–650</td>
+                    </tr>
+                    <tr>
+                      <td>Standard personal errand</td>
+                      <td class="num-col">৳650–750</td>
+                    </tr>
+                    <tr>
+                      <td>Multiple-stop errands and shopping</td>
+                      <td class="num-col">৳750–1,000</td>
+                    </tr>
+                    <tr>
+                      <td>Complex or time-consuming errands</td>
+                      <td class="num-col">৳1,000–1,500+</td>
+                    </tr>
+                    <tr>
+                      <td>Extended personal assistance</td>
+                      <td class="num-col">Custom quotation</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="pricing-card-foot">
+                  <button type="button" class="btn btn-primary" data-select-service="Personal Concierge">Request Concierge Quote</button>
+                </div>
               </div>
-              <div class="contact-info">
-                <span class="contact-platform">WhatsApp</span>
-                <strong class="contact-detail">Chat with us directly</strong>
-                <span class="contact-sub">01865383565</span>
-              </div>
-              <span class="contact-action-badge">Open Chat &rarr;</span>
-            </a>
 
-            <!-- 2. Instagram Direct DM -->
-            <a
-              class="contact-item contact-item-ig"
-              href="https://ig.me/m/littlebighelp28"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Send direct message on Instagram: @littlebighelp28"
-            >
-              <div class="contact-icon-frame" aria-hidden="true">
-                <img src="assets/images/logo-instagram.svg" alt="" width="32" height="32" />
+              <div class="pricing-rules-card">
+                <h4>Personal Concierge Operating Rules</h4>
+                <ol class="rules-list">
+                  <li>Confirm customer request, number of stops, and estimated duration before starting.</li>
+                  <li>Quote the ALLORA service fee and transportation cost separately.</li>
+                  <li>Collect advance payment covering the service fee and estimated item/expense cost.</li>
+                  <li>Complete purchases only after confirming customer approval and received funds.</li>
+                  <li>Provide live task updates, share item receipts and expense details, and return or credit any unused advance funds.</li>
+                </ol>
               </div>
-              <div class="contact-info">
-                <span class="contact-platform">Instagram</span>
-                <strong class="contact-detail">Direct DM</strong>
-                <span class="contact-sub">@littlebighelp28</span>
-              </div>
-              <span class="contact-action-badge">Send DM &rarr;</span>
-            </a>
+            </div>
+          </div>
 
-            <!-- 3. Facebook Messenger DM -->
-            <a
-              class="contact-item contact-item-fb"
-              href="https://m.me/61595733184255"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Direct message on Facebook Messenger"
-            >
-              <div class="contact-icon-frame" aria-hidden="true">
-                <img src="assets/images/logo-facebook.svg" alt="" width="32" height="32" />
-              </div>
-              <div class="contact-info">
-                <span class="contact-platform">Facebook Messenger</span>
-                <strong class="contact-detail">Messenger DM</strong>
-                <span class="contact-sub">Little Big Help page</span>
-              </div>
-              <span class="contact-action-badge">Start DM &rarr;</span>
-            </a>
+          <!-- Panel 2: Local Assistance -->
+          <div class="pricing-panel is-hidden" data-pricing-panel="Local Assistance">
+            <div class="pricing-panel-grid">
+              <div class="pricing-table-card">
+                <div class="pricing-card-head">
+                  <div>
+                    <p class="pricing-kicker">Category 02 &middot; Sylhet Verification &amp; Coordination</p>
+                    <h3>Local Assistance Fees &amp; Additional Charges</h3>
+                  </div>
+                  <span class="pricing-pill-note">Distinct from Concierge</span>
+                </div>
+                <table class="rate-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Assistance Scope</th>
+                      <th scope="col" class="num-col">Service Fee (BDT)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Basic location verification</td>
+                      <td class="num-col">৳500–650</td>
+                    </tr>
+                    <tr>
+                      <td>Local coordination</td>
+                      <td class="num-col">৳650–850</td>
+                    </tr>
+                    <tr>
+                      <td>Visitor and tourist assistance</td>
+                      <td class="num-col">৳850–1,200</td>
+                    </tr>
+                    <tr>
+                      <td>Extended local assistance</td>
+                      <td class="num-col">৳1,200–1,800+</td>
+                    </tr>
+                    <tr>
+                      <td>Full-day personal assistance</td>
+                      <td class="num-col">৳2,000–3,000+</td>
+                    </tr>
+                  </tbody>
+                </table>
 
-            <!-- 4. Direct Email -->
-            <a
-              class="contact-item contact-item-email"
-              href="mailto:littlebighelp28@gmail.com?subject=Task%20Inquiry%20-%20Little%20Big%20Help&body=Hi%20Little%20Big%20Help%20team%2C%0A%0AI%20have%20a%20task%20in%20mind%3A"
-              aria-label="Email Little Big Help at littlebighelp28@gmail.com"
-            >
-              <div class="contact-icon-frame" aria-hidden="true">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                  <polyline points="22,6 12,13 2,6"/>
-                </svg>
-              </div>
-              <div class="contact-info">
-                <span class="contact-platform">Email</span>
-                <strong class="contact-detail">littlebighelp28@gmail.com</strong>
-                <span class="contact-sub">Send task details anytime</span>
-              </div>
-              <span class="contact-action-badge">Send Email &rarr;</span>
-            </a>
+                <h4 class="subtable-heading">Additional Charges</h4>
+                <table class="rate-table rate-table-compact">
+                  <tbody>
+                    <tr>
+                      <td>Additional location</td>
+                      <td class="num-col">৳150–250</td>
+                    </tr>
+                    <tr>
+                      <td>Additional coordination task</td>
+                      <td class="num-col">৳150–300</td>
+                    </tr>
+                    <tr>
+                      <td>Extended waiting</td>
+                      <td class="num-col">৳150 per 30 minutes</td>
+                    </tr>
+                    <tr>
+                      <td>Urgent same-day request</td>
+                      <td class="num-col">25% surcharge</td>
+                    </tr>
+                  </tbody>
+                </table>
 
-            <!-- 5. Phone Call -->
-            <a
-              class="contact-item contact-item-phone"
-              href="tel:+8801865383565"
-              aria-label="Call Little Big Help on 01865383565"
-            >
-              <div class="contact-icon-frame" aria-hidden="true">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-                </svg>
+                <div class="pricing-card-foot">
+                  <button type="button" class="btn btn-primary" data-select-service="Local Assistance">Book Local Assistance</button>
+                </div>
               </div>
-              <div class="contact-info">
-                <span class="contact-platform">Phone</span>
-                <strong class="contact-detail">01865383565</strong>
-                <span class="contact-sub">Direct telephone line</span>
+
+              <div class="pricing-rules-card">
+                <h4>Local Assistance Operating Rules</h4>
+                <ol class="rules-list">
+                  <li>Confirm exact location, coordination scope, and expected duration before acceptance.</li>
+                  <li>Clarify upfront whether physical on-site attendance is required or remote verification applies.</li>
+                  <li>Confirm coordinator availability before accepting or promising any booking.</li>
+                  <li>Quote transport, meals, accommodation, tickets, or third-party costs strictly separately from ALLORA service fees.</li>
+                  <li>Requests outside Sylhet are accepted only where a reliable local partner can be confirmed first.</li>
+                </ol>
               </div>
-              <span class="contact-action-badge">Call Now &rarr;</span>
-            </a>
+            </div>
+          </div>
+
+          <!-- Panel 3: Business Solutions -->
+          <div class="pricing-panel is-hidden" data-pricing-panel="Business Solutions">
+            <div class="pricing-panel-grid">
+              <div class="pricing-table-card">
+                <div class="pricing-card-head">
+                  <div>
+                    <p class="pricing-kicker">Category 03 &middot; Minimum Starting Price: ৳10,000 BDT</p>
+                    <h3>Business Solutions Indicative Pricing</h3>
+                  </div>
+                  <span class="pricing-pill-note">Scoped Deliverables</span>
+                </div>
+                <table class="rate-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Business Solution Stream</th>
+                      <th scope="col" class="num-col">Indicative Range (BDT)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Business Operations Support</td>
+                      <td class="num-col">৳10,000–15,000</td>
+                    </tr>
+                    <tr>
+                      <td>Administrative and Documentation Support</td>
+                      <td class="num-col">৳10,000–14,000</td>
+                    </tr>
+                    <tr>
+                      <td>Customer Service Support</td>
+                      <td class="num-col">৳10,000–18,000</td>
+                    </tr>
+                    <tr>
+                      <td>Business Coordination and Management Assistance</td>
+                      <td class="num-col">৳12,000–20,000</td>
+                    </tr>
+                    <tr>
+                      <td>Business Errands and On-site Coordination</td>
+                      <td class="num-col">৳10,000–12,000</td>
+                    </tr>
+                    <tr>
+                      <td>Business Development Assistance</td>
+                      <td class="num-col">৳15,000–25,000</td>
+                    </tr>
+                    <tr>
+                      <td>Extended Business Support</td>
+                      <td class="num-col">৳20,000–35,000+</td>
+                    </tr>
+                    <tr>
+                      <td>Dedicated Business Support</td>
+                      <td class="num-col">Custom quotation</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="pricing-card-foot">
+                  <button type="button" class="btn btn-primary" data-select-service="Business Solutions">Schedule Business Consultation</button>
+                </div>
+              </div>
+
+              <div class="pricing-rules-card">
+                <h4>Engagement Model &amp; Service Conditions</h4>
+                <ol class="rules-list">
+                  <li><strong>Consultation First:</strong> Conduct an initial consultation, assess workload, and define clear deliverables, hours, and communication expectations before quoting.</li>
+                  <li><strong>Final Pricing Factors:</strong> Quotations depend on workload volume, duration, complexity, operational responsibilities, and required resources.</li>
+                  <li><strong>Strict Scope Discipline:</strong> ALLORA does not offer unlimited or undefined workloads; any added responsibilities require prior written approval and revised pricing.</li>
+                  <li><strong>Separated Business Costs:</strong> Transport, business purchases, supplies, printing, courier, and third-party expenses are always billed separately.</li>
+                  <li><strong>Capacity Transparency:</strong> Dedicated staffing or specialist capabilities are offered only when confirmed operational capacity is in place.</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+
+          <!-- Panel 4: Digital Solutions -->
+          <div class="pricing-panel is-hidden" data-pricing-panel="Digital Solutions">
+            <div class="digital-pricing-grid">
+              <!-- A. Website Design & Development -->
+              <article class="pricing-table-card digital-featured-card">
+                <div class="pricing-card-head">
+                  <div>
+                    <p class="pricing-kicker">A &middot; Consultation-Based Custom Service</p>
+                    <h3>Website Design &amp; Development: ৳10,000–৳45,000 BDT</h3>
+                  </div>
+                  <span class="pricing-pill-note">60% Advance / 40% Handover</span>
+                </div>
+                <p class="digital-lead-note">
+                  ALLORA builds custom websites around your business goals rather than rigid template packages. Projects exceeding ৳45,000 receive a separate custom proposal. Domain, hosting, premium software, paid media assets, and third-party integrations are billed separately.
+                </p>
+                <div class="website-consult-steps">
+                  <div class="consult-step"><span>01</span> Initial consultation &amp; discovery</div>
+                  <div class="consult-step"><span>02</span> Scope &amp; visual direction</div>
+                  <div class="consult-step"><span>03</span> Written proposal &amp; schedule</div>
+                  <div class="consult-step"><span>04</span> 60% advance confirmation</div>
+                  <div class="consult-step"><span>05</span> Responsive design &amp; build</div>
+                  <div class="consult-step"><span>06</span> Forms, WhatsApp &amp; QA review</div>
+                  <div class="consult-step"><span>07</span> 40% final balance &amp; launch</div>
+                </div>
+              </article>
+
+              <!-- B, C, D, E Sub-schedules -->
+              <article class="pricing-table-card">
+                <div class="pricing-card-head">
+                  <div>
+                    <p class="pricing-kicker">B &middot; Social Media Services</p>
+                    <h3>Social Presence &amp; Management</h3>
+                  </div>
+                </div>
+                <table class="rate-table rate-table-compact">
+                  <tbody>
+                    <tr><td>Account setup</td><td class="num-col">৳2,000–3,500</td></tr>
+                    <tr><td>Profile and brand optimisation</td><td class="num-col">৳1,500–2,500</td></tr>
+                    <tr><td>Monthly content creation</td><td class="num-col">৳5,000–12,000</td></tr>
+                    <tr><td>Social media management</td><td class="num-col">৳5,000–10,000/month</td></tr>
+                    <tr><td>Extended social media management</td><td class="num-col">Custom quotation</td></tr>
+                  </tbody>
+                </table>
+                <p class="table-footnote">Paid advertising budgets are excluded and funded separately.</p>
+              </article>
+
+              <article class="pricing-table-card">
+                <div class="pricing-card-head">
+                  <div>
+                    <p class="pricing-kicker">C &amp; E &middot; Setup &amp; Consultation</p>
+                    <h3>Business Digital Setup &amp; Consultation</h3>
+                  </div>
+                </div>
+                <table class="rate-table rate-table-compact">
+                  <tbody>
+                    <tr><td>Business email setup</td><td class="num-col">৳1,000–2,000</td></tr>
+                    <tr><td>Google Business Profile setup</td><td class="num-col">৳1,500–2,500</td></tr>
+                    <tr><td>WhatsApp Business setup</td><td class="num-col">৳1,000–1,500</td></tr>
+                    <tr><td>Paid digital consultation</td><td class="num-col">Starting from ৳1,500</td></tr>
+                  </tbody>
+                </table>
+                <p class="table-footnote">Third-party domain/email costs billed separately. Complex specialist integrations proceed only with confirmed scope or partner support.</p>
+              </article>
+
+              <article class="pricing-table-card">
+                <div class="pricing-card-head">
+                  <div>
+                    <p class="pricing-kicker">D &middot; Ongoing Support</p>
+                    <h3>Website &amp; Technical Support</h3>
+                  </div>
+                </div>
+                <table class="rate-table rate-table-compact">
+                  <tbody>
+                    <tr><td>Website content updates</td><td class="num-col">৳1,000–2,500</td></tr>
+                    <tr><td>Technical assistance &amp; troubleshooting</td><td class="num-col">৳1,000–3,000</td></tr>
+                    <tr><td>Basic maintenance</td><td class="num-col">৳2,000/month</td></tr>
+                    <tr><td>Standard maintenance</td><td class="num-col">৳3,500/month</td></tr>
+                    <tr><td>Extended maintenance</td><td class="num-col">৳5,500/month</td></tr>
+                  </tbody>
+                </table>
+                <p class="table-footnote">Plans operate with clearly defined update limits, backup intervals, support hours, and covered fix types.</p>
+              </article>
+            </div>
+            <div class="digital-panel-cta">
+              <button type="button" class="btn btn-primary" data-select-service="Digital Solutions">Start Digital Solutions Consultation</button>
+            </div>
+          </div>
+
+          <!-- General Pricing Policy & Cost Separation Band -->
+          <div class="policy-grid" aria-label="General Pricing Policy and Cost Separation">
+            <div class="policy-card">
+              <p class="eyebrow">Cost Separation Standard</p>
+              <h3>Five Transparent Cost Components</h3>
+              <p class="policy-intro">ALLORA never hides third-party expenses inside its service fees and never adds unapproved charges.</p>
+              <ul class="policy-bullets">
+                <li><strong>1. ALLORA Service Fee:</strong> Agreed coordination, planning, or delivery fee in BDT.</li>
+                <li><strong>2. Transportation:</strong> Charged separately at agreed actual cost.</li>
+                <li><strong>3. Customer Purchases:</strong> Exact retail/product cost confirmed prior to buying.</li>
+                <li><strong>4. Third-Party Expenses:</strong> Venue tickets, domains, hosting, courier, printing, or external fees.</li>
+                <li><strong>5. Approved Scope Additions:</strong> Extra stops, waiting time, or expanded tasks approved by you first.</li>
+              </ul>
+            </div>
+
+            <div class="policy-card">
+              <p class="eyebrow">Advance &amp; Reconciliation Policy</p>
+              <h3>Clear Financial Handling Across Categories</h3>
+              <ul class="policy-bullets">
+                <li><strong>Concierge &amp; Local Assistance:</strong> Advance payment covers the quoted service fee plus estimated task expenses. Original receipts are shared and unused funds are returned or credited.</li>
+                <li><strong>Business Solutions:</strong> Milestone or monthly payment schedule documented clearly in writing before onboarding.</li>
+                <li><strong>Website Development:</strong> 60% advance prior to development start; 40% final balance due before launch or handover.</li>
+                <li><strong>Availability &amp; Coverage:</strong> Physical assistance operates in Sylhet (other cities only via confirmed local partner). Digital Solutions operate Bangladesh-wide.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- How It Works / Customer Journey Section -->
+      <section class="process-section section" id="how-it-works" aria-labelledby="process-heading">
+        <div class="container">
+          <div class="section-header-split section-header-dark">
+            <div>
+              <p class="eyebrow eyebrow-gold">The Customer Journey</p>
+              <h2 id="process-heading" class="section-title section-title-light">Disciplined from inquiry to reconciliation.</h2>
+            </div>
+            <p class="section-lead section-lead-light">
+              No hidden costs, no rushed promises. Every request follows a clear step-by-step confirmation and expense reconciliation process.
+            </p>
+          </div>
+
+          <div class="steps-grid steps-grid-4">
+            <article class="step-card">
+              <span class="step-index">01</span>
+              <h3 class="step-title">Inquiry &amp; Clarification</h3>
+              <p class="step-desc">
+                Submit your task, business scope, or digital needs via our form or WhatsApp. We review stops, timing, location, and deliverables.
+              </p>
+            </article>
+
+            <article class="step-card">
+              <span class="step-index">02</span>
+              <h3 class="step-title">Scope &amp; Quote Approval</h3>
+              <p class="step-desc">
+                We confirm availability and issue an itemised BDT quote separating ALLORA&rsquo;s service fee from any expected transport or third-party costs.
+              </p>
+            </article>
+
+            <article class="step-card">
+              <span class="step-index">03</span>
+              <h3 class="step-title">Advance &amp; Execution</h3>
+              <p class="step-desc">
+                Once approved and required advance funds are received, we execute with thoughtful care and provide timely progress updates.
+              </p>
+            </article>
+
+            <article class="step-card">
+              <span class="step-index">04</span>
+              <h3 class="step-title">Completion &amp; Reconciliation</h3>
+              <p class="step-desc">
+                We complete handover, share original purchase or travel receipts, and return or credit any unused advance balance promptly.
+              </p>
+            </article>
+          </div>
+
+          <div class="process-guarantee">
+            <p>
+              <strong>Commitment to clarity:</strong> Availability, separated costs, and scope limits are agreed in writing before any task or development begins.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- About Allora Section -->
+      <section class="about-section section" id="about" aria-labelledby="about-heading">
+        <div class="container about-grid">
+          <div class="about-heading-col">
+            <p class="eyebrow">About Allora</p>
+            <h2 id="about-heading" class="section-title">
+              Premium presentation, accessible pricing, dependable care.
+            </h2>
+            <p class="about-tagline">Thoughtful assistance. Everyday convenience. Exceptional care.</p>
+          </div>
+
+          <div class="about-prose-col">
+            <p class="about-lead">
+              ALLORA is a professional personal assistance, local concierge, business solutions, and digital solutions service headquartered in Sylhet, Bangladesh.
+            </p>
+            <p>
+              Whether you live in Sylhet, support loved ones from abroad, visit the region on business or travel, or run a growing company anywhere in Bangladesh needing clear digital execution, ALLORA offers a calm, organised point of contact.
+            </p>
+            <p>
+              We operate strictly on confirmed availability and transparent cost separation: we never make unverified guarantees outside our operational reach and always confirm scope before committing your time or funds.
+            </p>
+
+            <div class="about-audiences">
+              <div class="audience-item">
+                <h3>Sylhet Concierge &amp; Local Support</h3>
+                <p>Everyday errands, location checks, visitor guidance, and verified physical coordination across Sylhet—extended outside Sylhet only with confirmed partners.</p>
+              </div>
+              <div class="audience-item">
+                <h3>Bangladesh-Wide Digital &amp; Scoped Business</h3>
+                <p>Custom websites, social &amp; digital setup nationwide, alongside structured Business Solutions subject to defined project capacity.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Contact & Inquiry Section -->
+      <section class="contact-section section" id="contact" aria-labelledby="contact-heading">
+        <div class="container contact-grid">
+          <!-- Left: Direct Channels -->
+          <div class="contact-info-col">
+            <p class="eyebrow">Get In Touch</p>
+            <h2 id="contact-heading" class="section-title">Request a clear quotation.</h2>
+            <p class="contact-intro">
+              Share your requirements below or message us directly. An ALLORA coordinator will confirm availability, scope, and transparent BDT pricing before any work begins.
+            </p>
+
+            <div class="direct-channels" aria-label="Direct contact channels">
+              <a
+                href="https://wa.me/8801865383565?text=Hello%20Allora%2C%20I%20would%20like%20to%20request%20a%20quotation."
+                class="channel-row"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span class="channel-icon-wrap" aria-hidden="true">
+                  <img src="assets/images/logo-whatsapp.svg" alt="" width="24" height="24" />
+                </span>
+                <span class="channel-copy">
+                  <span class="channel-label">WhatsApp</span>
+                  <span class="channel-value">+880 1865-383565</span>
+                </span>
+                <span class="channel-action">Message &rarr;</span>
+              </a>
+
+              <a
+                href="mailto:littlebighelp28@gmail.com?subject=Assistance%20Inquiry%20-%20ALLORA"
+                class="channel-row"
+              >
+                <span class="channel-icon-wrap" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="4" width="20" height="16" rx="2" />
+                    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                  </svg>
+                </span>
+                <span class="channel-copy">
+                  <span class="channel-label">Email</span>
+                  <span class="channel-value">littlebighelp28@gmail.com</span>
+                </span>
+                <span class="channel-action">Send Email &rarr;</span>
+              </a>
+
+              <a
+                href="https://ig.me/m/littlebighelp28"
+                class="channel-row"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span class="channel-icon-wrap" aria-hidden="true">
+                  <img src="assets/images/logo-instagram.svg" alt="" width="24" height="24" />
+                </span>
+                <span class="channel-copy">
+                  <span class="channel-label">Instagram</span>
+                  <span class="channel-value">@littlebighelp28</span>
+                </span>
+                <span class="channel-action">Direct DM &rarr;</span>
+              </a>
+
+              <a
+                href="https://m.me/61595733184255"
+                class="channel-row"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span class="channel-icon-wrap" aria-hidden="true">
+                  <img src="assets/images/logo-facebook.svg" alt="" width="24" height="24" />
+                </span>
+                <span class="channel-copy">
+                  <span class="channel-label">Facebook Messenger</span>
+                  <span class="channel-value">Messenger Direct</span>
+                </span>
+                <span class="channel-action">Start Chat &rarr;</span>
+              </a>
+
+              <a href="tel:+8801865383565" class="channel-row">
+                <span class="channel-icon-wrap" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                  </svg>
+                </span>
+                <span class="channel-copy">
+                  <span class="channel-label">Phone</span>
+                  <span class="channel-value">+880 1865-383565</span>
+                </span>
+                <span class="channel-action">Call Line &rarr;</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Right: Structured Inquiry Form -->
+          <div class="contact-form-col">
+            <div class="inquiry-panel">
+              <div class="inquiry-panel-head">
+                <h3>Request Assistance or Quotation</h3>
+                <p>Share your task or consultation scope. Separated BDT pricing and availability are confirmed before work starts.</p>
+              </div>
+
+              <div id="form-feedback" class="form-alert is-hidden" role="alert" aria-live="polite"></div>
+
+              <form id="service-request-form" class="inquiry-form" novalidate>
+                <div class="form-row-2">
+                  <div class="form-group">
+                    <label for="form-name">Customer Name <span class="req" aria-hidden="true">*</span></label>
+                    <input
+                      type="text"
+                      id="form-name"
+                      name="customerName"
+                      class="form-input"
+                      placeholder="Your full name or business"
+                      required
+                      maxlength="120"
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label for="form-whatsapp">WhatsApp Number <span class="req" aria-hidden="true">*</span></label>
+                    <input
+                      type="tel"
+                      id="form-whatsapp"
+                      name="whatsappNumber"
+                      class="form-input"
+                      placeholder="+880 1XXX-XXXXXX"
+                      required
+                      maxlength="40"
+                    />
+                  </div>
+                </div>
+
+                <div class="form-row-2">
+                  <div class="form-group">
+                    <label for="form-email">Email <span class="opt">(Optional)</span></label>
+                    <input
+                      type="email"
+                      id="form-email"
+                      name="email"
+                      class="form-input"
+                      placeholder="you@example.com"
+                      maxlength="160"
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label for="form-service">Service Category <span class="req" aria-hidden="true">*</span></label>
+                    <select id="form-service" name="serviceCategory" class="form-input form-select" required>
+                      <option value="Personal Concierge">Personal Concierge (From ৳500)</option>
+                      <option value="Local Assistance">Local Assistance (From ৳500)</option>
+                      <option value="Business Solutions">Business Solutions (Min. ৳10,000)</option>
+                      <option value="Digital Solutions">Digital Solutions (Bangladesh-Wide)</option>
+                      <option value="Custom Request">Custom Quotation Request</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-row-2">
+                  <div class="form-group">
+                    <label for="form-location">Location <span class="opt">(Sylhet or city)</span></label>
+                    <input
+                      type="text"
+                      id="form-location"
+                      name="location"
+                      class="form-input"
+                      placeholder="e.g. Zindabazar, Sylhet, or Dhaka (Digital)"
+                      maxlength="200"
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label for="form-date">Preferred Date</label>
+                    <input
+                      type="date"
+                      id="form-date"
+                      name="preferredDate"
+                      class="form-input"
+                    />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="form-urgency">Request Timing &amp; Priority</label>
+                  <select id="form-urgency" name="urgency" class="form-input form-select">
+                    <option value="Standard">Standard Scheduling (Regular Service Fee)</option>
+                    <option value="Urgent Same-Day (+25% surcharge if available)">Urgent Same-Day Inquiry (25% surcharge where applicable, subject to availability)</option>
+                  </select>
+                </div>
+
+                <!-- Digital Solutions Conditional Fields -->
+                <div class="digital-fields is-hidden" id="website-enquiry-fields">
+                  <div class="form-row-2">
+                    <div class="form-group">
+                      <label for="form-biz-name">Business Name <span class="opt">(Optional)</span></label>
+                      <input type="text" id="form-biz-name" name="businessName" class="form-input" placeholder="e.g. Sylhet Botanical Studio" maxlength="120" />
+                    </div>
+                    <div class="form-group">
+                      <label for="form-website-url">Existing Website <span class="opt">(Optional)</span></label>
+                      <input type="url" id="form-website-url" name="existingWebsite" class="form-input" placeholder="https://example.com" maxlength="200" />
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="form-website-type">Digital Solution Focus</label>
+                    <select id="form-website-type" name="websiteType" class="form-input form-select">
+                      <option value="Custom Website Design & Development (৳10,000–৳45,000)">Custom Website Design &amp; Development (৳10,000–৳45,000)</option>
+                      <option value="Website Exceeding ৳45,000 (Custom Proposal)">Website Project Exceeding ৳45,000 (Custom Proposal)</option>
+                      <option value="Social Media Services (৳1,500–৳12,000+)">Social Media Services (Setup / Content / Management)</option>
+                      <option value="Business Digital Setup (৳1,000–৳2,500)">Business Digital Setup (Email / Google Business / WhatsApp)</option>
+                      <option value="Website & Technical Support / Maintenance (৳1,000–৳5,500/mo)">Website &amp; Technical Support / Monthly Maintenance</option>
+                      <option value="Paid Digital Consultation (From ৳1,500)">Paid Digital Consultation (Starting from ৳1,500)</option>
+                    </select>
+                  </div>
+                  <label class="checkbox-row">
+                    <input type="checkbox" id="form-maintenance" name="includeMaintenance" />
+                    <span>Include discussion for ongoing monthly website maintenance (from ৳2,000/month)</span>
+                  </label>
+                </div>
+
+                <div class="form-group">
+                  <label for="form-details">Task or Project Description <span class="req" aria-hidden="true">*</span></label>
+                  <textarea
+                    id="form-details"
+                    name="taskDescription"
+                    class="form-input form-textarea"
+                    rows="3"
+                    placeholder="Share stops, items, verification details, business deliverables, or website goals..."
+                    required
+                    maxlength="3000"
+                  ></textarea>
+                </div>
+
+                <div class="form-group">
+                  <label for="form-additional">Additional Notes <span class="opt">(Optional)</span></label>
+                  <textarea
+                    id="form-additional"
+                    name="additionalDetails"
+                    class="form-input form-textarea-sm"
+                    rows="2"
+                    placeholder="Special timing, whether physical attendance is needed, or preference notes..."
+                    maxlength="2000"
+                  ></textarea>
+                </div>
+
+                <div class="form-submit-row">
+                  <button type="submit" id="btn-submit-inquiry" class="btn btn-primary btn-full">
+                    <span id="submit-inquiry-label">Submit Inquiry</span>
+                  </button>
+                </div>
+              </form>
+
+              <!-- Clear Inline Confirmation Card -->
+              <div id="inquiry-confirmation" class="confirmation-card is-hidden" role="status" aria-live="polite">
+                <div class="confirmation-header">
+                  <span class="confirmation-tag">Inquiry Received</span>
+                  <span class="confirmation-ref" id="confirm-ref-id"></span>
+                </div>
+                <h4 id="confirm-heading">Thank you. Your request has been recorded.</h4>
+                <p id="confirm-message">
+                  An Allora coordinator will review your details via WhatsApp or email to confirm availability and itemised BDT pricing before any work begins.
+                </p>
+                <div class="confirmation-actions">
+                  <a id="confirm-whatsapp-link" href="https://wa.me/8801865383565" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+                    Open Summary in WhatsApp &rarr;
+                  </a>
+                  <button type="button" id="btn-new-inquiry" class="btn btn-secondary">Submit Another Request</button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -577,112 +1106,82 @@
 
     <!-- Footer -->
     <footer class="site-footer">
-      <div class="footer-container">
-        <!-- Brand Block -->
-        <div class="footer-brand-col">
-          <a href="#home" class="footer-brand" aria-label="Little Big Help home">
-            <img
-              src="assets/images/interlocking-relief-social-tile.png"
-              alt=""
-              class="footer-logo"
-              width="34"
-              height="34"
-            />
-            <div class="footer-brand-text">
-              <span class="footer-name">Little Big Help</span>
-              <span class="footer-tagline">Small Tasks, Big Relief</span>
-            </div>
-          </a>
-          <p class="footer-about">
-            Everyday errands, local assistance, and practical support for your personal life or small business in Sylhet.
-          </p>
-        </div>
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-brand-col">
+            <a href="#home" class="footer-brand-link" aria-label="ALLORA home">
+              <img src="assets/images/allora-emblem.svg" alt="" width="34" height="34" class="footer-emblem" />
+              <span class="footer-wordmark">ALLORA</span>
+            </a>
+            <p class="footer-tagline">Life, made lighter.</p>
+            <p class="footer-desc">
+              Personal concierge and local assistance in Sylhet, Business Solutions, and Bangladesh-wide Digital Solutions. All prices in BDT.
+            </p>
+          </div>
 
-        <!-- Quick Links -->
-        <div class="footer-links-col">
-          <span class="footer-col-title">Quick Links</span>
-          <ul class="footer-nav">
-            <li><a href="#services">Services</a></li>
-            <li><a href="#how-it-works">How It Works</a></li>
-            <li><a href="#contact">Contact</a></li>
-          </ul>
-        </div>
+          <div class="footer-col">
+            <span class="footer-heading">Services</span>
+            <ul class="footer-list">
+              <li><a href="#services" data-footer-filter="Personal Concierge">Personal Concierge</a></li>
+              <li><a href="#services" data-footer-filter="Local Assistance">Local Assistance</a></li>
+              <li><a href="#services" data-footer-filter="Business Solutions">Business Solutions</a></li>
+              <li><a href="#services" data-footer-filter="Digital Solutions">Digital Solutions</a></li>
+            </ul>
+          </div>
 
-        <!-- Social DM Icons -->
-        <div class="footer-social-col">
-          <span class="footer-col-title">Connect With Us</span>
-          <p class="footer-social-note">Reach us directly on your preferred channel:</p>
-          <div class="footer-social-strip" aria-label="Social direct links">
-            <a
-              href="https://wa.me/8801865383565?text=Hello%20Little%20Big%20Help%2C%20I%20would%20like%20to%20inquire%20about%20your%20services."
-              class="social-link social-link-wa"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Direct WhatsApp Business Chat"
-              title="Open WhatsApp Chat DM"
-            >
-              <img src="assets/images/logo-whatsapp.svg" alt="" width="22" height="22" />
-            </a>
-            <a
-              href="https://ig.me/m/littlebighelp28"
-              class="social-link social-link-ig"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Direct Instagram DM"
-              title="Open Instagram Direct DM"
-            >
-              <img src="assets/images/logo-instagram.svg" alt="" width="22" height="22" />
-            </a>
-            <a
-              href="https://m.me/61595733184255"
-              class="social-link social-link-fb"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Direct Facebook Messenger DM"
-              title="Open Facebook Messenger DM"
-            >
-              <img src="assets/images/logo-facebook.svg" alt="" width="22" height="22" />
-            </a>
-            <a
-              href="mailto:littlebighelp28@gmail.com?subject=Task%20Inquiry%20-%20Little%20Big%20Help"
-              class="social-link social-link-email"
-              aria-label="Send Email"
-              title="Send Direct Email"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                <polyline points="22,6 12,13 2,6"/>
-              </svg>
-            </a>
-            <a
-              href="tel:+8801865383565"
-              class="social-link social-link-phone"
-              aria-label="Call Directly"
-              title="Call 01865383565"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-              </svg>
-            </a>
+          <div class="footer-col">
+            <span class="footer-heading">Navigation</span>
+            <ul class="footer-list">
+              <li><a href="#home">Home</a></li>
+              <li><a href="#pricing">Pricing &amp; Policies</a></li>
+              <li><a href="#how-it-works">Customer Journey</a></li>
+              <li><a href="#about">About</a></li>
+              <li><a href="#contact">Get Assistance</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-col">
+            <span class="footer-heading">Connect</span>
+            <ul class="footer-list">
+              <li>
+                <a href="https://wa.me/8801865383565" target="_blank" rel="noopener noreferrer">
+                  WhatsApp: +880 1865-383565
+                </a>
+              </li>
+              <li>
+                <a href="mailto:littlebighelp28@gmail.com">littlebighelp28@gmail.com</a>
+              </li>
+              <li>
+                <a href="https://ig.me/m/littlebighelp28" target="_blank" rel="noopener noreferrer">
+                  Instagram: @littlebighelp28
+                </a>
+              </li>
+              <li>
+                <a href="https://m.me/61595733184255" target="_blank" rel="noopener noreferrer">
+                  Facebook Messenger
+                </a>
+              </li>
+            </ul>
           </div>
         </div>
-      </div>
 
-      <div class="footer-bottom">
-        <p class="copyright">&copy; <span id="current-year">2026</span> Little Big Help. All rights reserved.</p>
+        <div class="footer-bottom">
+          <p>&copy; <span id="current-year">2026</span> Allora. All rights reserved.</p>
+          <p class="footer-location">Sylhet, Bangladesh &middot; Digital Solutions Bangladesh-Wide</p>
+        </div>
       </div>
     </footer>
 
-    <!-- Compact Floating WhatsApp Widget (Carefully positioned to avoid obscuring content) -->
+    <!-- Compact Floating WhatsApp Action -->
     <a
-      href="https://wa.me/8801865383565?text=Hello%20Little%20Big%20Help%2C%20I%20would%20like%20to%20inquire%20about%20your%20services."
+      href="https://wa.me/8801865383565?text=Hello%20Allora%2C%20I%20would%20like%20assistance."
       class="floating-whatsapp"
       target="_blank"
       rel="noopener noreferrer"
-      aria-label="Chat directly on WhatsApp"
-      title="Chat on WhatsApp"
+      aria-label="Message Allora on WhatsApp"
+      title="Message Allora on WhatsApp"
     >
-      <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true">
         <path d="M20.52 3.48A11.93 11.93 0 0 0 12.2 1C6.64 1 2.1 5.54 2.1 11.1c0 1.95.52 3.86 1.5 5.54L2 22l5.5-1.57a10.1 10.1 0 0 0 4.7 1.38h.01c5.56 0 10.1-4.54 10.1-10.1 0-2.7-1.05-5.24-2.79-7.23ZM12.2 18.28h-.01a8.38 8.38 0 0 1-4.27-1.17l-.31-.18-3.27.94.87-3.18-.2-.33A8.38 8.38 0 1 1 12.2 18.28Zm4.6-6.24c-.25-.13-1.47-.72-1.7-.81-.23-.08-.4-.13-.57.13-.17.25-.65.81-.8 1-.15.17-.3.19-.55.06-.25-.13-1.05-.39-2-1.25-.74-.66-1.24-1.47-1.39-1.72-.15-.25-.02-.39.11-.52.11-.11.25-.3.38-.45.13-.15.17-.26.25-.43.08-.17.04-.32-.02-.45-.06-.13-.57-1.37-.78-1.88-.21-.51-.42-.44-.57-.45h-.49c-.17 0-.45.06-.68.32-.23.25-.88.86-.88 2.11s.9 2.44.99 2.61c.09.17 1.75 2.63 4.22 3.63.59.25 1.04.4 1.4.5.59.19 1.13.16 1.55.1.47-.07 1.47-.6 1.68-1.18.21-.58.21-1.08.15-1.18-.06-.1-.22-.16-.47-.29Z" />
       </svg>
     </a>

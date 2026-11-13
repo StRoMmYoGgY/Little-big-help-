@@ -26,7 +26,21 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.join(__dirname, '.env') });
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+
+// Parse port and host from CLI arguments or environment variables
+const cliArgs = process.argv.slice(2);
+let cliPort = null;
+let cliHost = null;
+for (let i = 0; i < cliArgs.length; i++) {
+  if (cliArgs[i] === '--port' && cliArgs[i + 1]) {
+    cliPort = parseInt(cliArgs[i + 1], 10);
+  }
+  if (cliArgs[i] === '--host' && cliArgs[i + 1]) {
+    cliHost = cliArgs[i + 1];
+  }
+}
+const PORT = cliPort || (process.env.PORT ? parseInt(process.env.PORT, 10) : 3000);
+const HOST = cliHost || process.env.HOST || '0.0.0.0';
 const DATA_DIR = path.join(__dirname, 'data');
 
 if (!fs.existsSync(DATA_DIR)) {
@@ -34,6 +48,7 @@ if (!fs.existsSync(DATA_DIR)) {
 }
 
 const CAMPAIGNS_FILE = path.join(DATA_DIR, 'campaigns.json');
+const INQUIRIES_FILE = path.join(DATA_DIR, 'inquiries.json');
 const SETTINGS_FILE = path.join(DATA_DIR, 'settings.json');
 const SESSIONS_FILE = path.join(DATA_DIR, 'sessions.json');
 
@@ -210,6 +225,10 @@ function initStorage() {
   if (!fs.existsSync(SESSIONS_FILE)) {
     writeJsonAtomic(SESSIONS_FILE, {});
   }
+
+  if (!fs.existsSync(INQUIRIES_FILE)) {
+    writeJsonAtomic(INQUIRIES_FILE, []);
+  }
 }
 
 initStorage();
@@ -296,6 +315,70 @@ async function removeStoredCampaign(campaignId) {
       firestoreStatus.connected = true;
     } catch (err) {
       console.error(`[Firestore] Failed to delete campaign ${campaignId}:`, err.message);
+    }
+  }
+}
+
+async function getStoredInquiries() {
+  if (firestoreDb) {
+    try {
+      const snap = await getDocs(collection(firestoreDb, 'inquiries'));
+      firestoreStatus.connected = true;
+      if (snap.docs.length > 0) {
+        const inquiries = snap.docs.map(d => d.data());
+        inquiries.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+        writeJsonAtomic(INQUIRIES_FILE, inquiries);
+        return inquiries;
+      } else {
+        const localInquiries = readJson(INQUIRIES_FILE) || [];
+        if (localInquiries.length > 0) {
+          for (const inq of localInquiries) {
+            await setDoc(doc(firestoreDb, 'inquiries', inq.id), inq).catch(() => {});
+          }
+        }
+        return localInquiries;
+      }
+    } catch (err) {
+      console.warn('[Firestore] Error querying inquiries, using local cache:', err.message);
+    }
+  }
+  const local = readJson(INQUIRIES_FILE) || [];
+  local.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+  return local;
+}
+
+async function persistInquiry(inquiry) {
+  const inquiries = readJson(INQUIRIES_FILE) || [];
+  const idx = inquiries.findIndex(i => i.id === inquiry.id);
+  if (idx >= 0) {
+    inquiries[idx] = inquiry;
+  } else {
+    inquiries.unshift(inquiry);
+  }
+  writeJsonAtomic(INQUIRIES_FILE, inquiries);
+
+  if (firestoreDb) {
+    try {
+      await setDoc(doc(firestoreDb, 'inquiries', inquiry.id), inquiry);
+      firestoreStatus.connected = true;
+    } catch (err) {
+      console.error(`[Firestore] Failed to persist inquiry ${inquiry.id}:`, err.message);
+    }
+  }
+  return inquiry;
+}
+
+async function removeStoredInquiry(inquiryId) {
+  let inquiries = readJson(INQUIRIES_FILE) || [];
+  inquiries = inquiries.filter(i => i.id !== inquiryId);
+  writeJsonAtomic(INQUIRIES_FILE, inquiries);
+
+  if (firestoreDb) {
+    try {
+      await deleteDoc(doc(firestoreDb, 'inquiries', inquiryId));
+      firestoreStatus.connected = true;
+    } catch (err) {
+      console.error(`[Firestore] Failed to delete inquiry ${inquiryId}:`, err.message);
     }
   }
 }
@@ -405,6 +488,7 @@ app.get('/api/health', async (req, res) => {
   }
 
   const campaigns = await getStoredCampaigns();
+  const inquiries = await getStoredInquiries();
   const settings = readJson(SETTINGS_FILE) || {};
 
   return res.json({
@@ -419,6 +503,7 @@ app.get('/api/health', async (req, res) => {
     },
     storage: {
       campaignsOnline: campaigns.length,
+      inquiriesOnline: inquiries.length,
       mode: firestoreDb ? 'firestore_persistent' : 'local_file'
     },
     credentialsConfigured: {
@@ -646,7 +731,7 @@ app.post('/api/auth/login', async (req, res) => {
     user: {
       email: normalizedEmail,
       role: 'Administrator',
-      name: 'Orgho (Little Big Help Admin)'
+      name: 'Orgho (ALLORA Admin)'
     }
   });
 });
@@ -661,7 +746,7 @@ app.get('/api/auth/me', async (req, res) => {
     user: {
       email: session.email,
       role: 'Administrator',
-      name: 'Orgho (Little Big Help Admin)'
+      name: 'Orgho (ALLORA Admin)'
     }
   });
 });
@@ -740,6 +825,7 @@ app.post('/api/auth/change-passcode', requireAdmin, (req, res) => {
 // ----------------- DATA PERSISTENCE & BACKUP (Priority 2) -----------------
 app.get('/api/backup/export', requireAdmin, async (req, res) => {
   const campaigns = await getStoredCampaigns();
+  const inquiries = await getStoredInquiries();
   const settings = readJson(SETTINGS_FILE) || {};
 
   // Omit sensitive secrets from export for safety
@@ -754,13 +840,14 @@ app.get('/api/backup/export', requireAdmin, async (req, res) => {
 
   const backupPackage = {
     exportedAt: new Date().toISOString(),
-    version: '1.0',
-    app: 'Little Big Help Marketing Engine',
+    version: '1.1',
+    app: 'ALLORA Concierge & Marketing Workspace',
     campaigns,
+    inquiries,
     settings: safeSettings
   };
 
-  res.setHeader('Content-Disposition', `attachment; filename="lbh-marketing-backup-${Date.now()}.json"`);
+  res.setHeader('Content-Disposition', `attachment; filename="allora-workspace-backup-${Date.now()}.json"`);
   res.setHeader('Content-Type', 'application/json');
   return res.json(backupPackage);
 });
@@ -824,47 +911,52 @@ app.post('/api/gemini/generate-campaign', requireAdmin, async (req, res) => {
     });
 
     const prompt = `
-You are the senior marketing director and copywriter for "Little Big Help", a trusted local concierge, errand, and business assistance company based in Sylhet, Bangladesh.
-Tagline: "Small Tasks, Big Relief".
-Brand values: friendly, trustworthy, clear pricing, warm, stress-free, reliable.
+You are the senior brand strategist and copywriter for "ALLORA", a professional personal assistance, local concierge, business solutions, and digital solutions service headquartered in Sylhet, Bangladesh.
+Tagline: "Life, made lighter."
+Supporting brand statement: "Thoughtful assistance. Everyday convenience. Exceptional care."
+Brand personality: sophisticated, trustworthy, approachable, modern, thoughtful, professional, international. Premium in presentation, accessible in transparent BDT pricing. Never sound like a cheap courier company and never make unverified guarantees or claim nationwide physical availability.
 Official WhatsApp: +880 1865-383565.
 Official Email: littlebighelp28@gmail.com.
 
-Services offered:
-1. Everyday Help (grocery shopping, household errands, bill payments, pharmacy pickups)
-2. Local Assistance in Sylhet (guiding visitors, doctor appointments, airport reception, elderly family check-ins)
-3. Business Support (document delivery, supplier pickups, administrative tasks, local coordination)
-4. Website Design & Development (modern, fast websites for local businesses, shops, and entrepreneurs with optional ongoing maintenance)
-5. Custom Requests (unique personal or commercial requests assessed individually)
+Service Coverage Rules:
+- Physical assistance and errands operate in Sylhet (subject to availability); physical services outside Sylhet only where a reliable local partner can be confirmed.
+- Digital Solutions operate Bangladesh-wide.
+- Business Solutions are subject to project scope and operational capacity.
 
-Generate a high-converting social media marketing campaign with 3 creative variations tailored for Facebook and Instagram.
+Services & Indicative BDT Pricing Offered:
+1. Personal Concierge (৳500–1,500+ BDT; Extended custom quotation): grocery & shopping, restaurant/food pickups, product collection & delivery, pharmacy/medicine collection, gift/flower arrangements, personal purchases, appointment/booking coordination. Service fee and transport expenses quoted separately; advance payment + receipt reconciliation.
+2. Local Assistance (৳500–3,000+ BDT; extra stops ৳150–300, waiting ৳150/30min, urgent same-day +25%): location & address verification, local info & guidance, tourist/visitor support, restaurant & venue coordination, transport arrangements in Sylhet.
+3. Business Solutions (Minimum starting price: ৳10,000 BDT; ৳10,000–35,000+ BDT / Custom): consultation-led business operations, admin & documentation, customer service support, business coordination, on-site coordination, business development. Defined scope (no unlimited workloads).
+4. Digital Solutions (Bangladesh-wide): consultation-based custom websites (৳10,000–৳45,000 BDT, 60% advance / 40% handover; not rigid packages), social media services (৳1,500–৳12,000+), business digital setup (email, Google Business Profile, WhatsApp Business ৳1,000–৳2,500), website maintenance (৳2,000–৳5,500/mo), paid digital consultation from ৳1,500.
+
+Generate a refined, high-converting social media marketing campaign with 3 creative variations tailored for Facebook and Instagram.
 
 Campaign Parameters:
 - Selected Category: ${serviceCategory || 'All Services / Brand Awareness'}
-- Specific Topic / Offer: ${customTopic || 'Everyday reliable assistance and peace of mind'}
-- Target Audience: ${targetAudience || 'Sylhet residents, busy professionals, and Non-Resident Bangladeshis (NRBs) supporting family in Sylhet'}
+- Specific Topic / Offer: ${customTopic || 'Thoughtful everyday assistance and personal concierge care in Sylhet'}
+- Target Audience: ${targetAudience || 'Sylhet residents, busy professionals, international visitors, and Non-Resident Bangladeshis supporting family in Sylhet'}
 - Promotional Goal: ${promotionalGoal || 'Generate WhatsApp inquiries and brand trust'}
-- Tone: ${tone || 'Friendly, reassuring, and professional'}
-- Language Style: ${language || 'English with natural Sylhet/Bengali cultural touchpoints'}
+- Tone: ${tone || 'Sophisticated, warm, reassuring, and professional'}
+- Language Style: ${language || 'English with natural Sylhet cultural touchpoints'}
 
 Return ONLY a valid JSON object matching this structure:
 {
   "campaignConcept": "string brief summary of marketing angle",
   "variations": [
     {
-      "variationName": "e.g., Direct Problem-Solver / Emotional Trust / Quick Action Offer",
-      "headline": "Punchy 6-10 word headline for visual banner",
+      "variationName": "e.g., Editorial Concierge / Practical Peace of Mind / Local & Visitor Care",
+      "headline": "Refined 6-10 word headline for visual banner",
       "hook": "First 1-2 captivating sentences for social feed scroll-stopping",
-      "bodyCopy": "Clear, formatted body with bullet points (using • or ✓) and emotional relief message",
-      "callToAction": "Specific call to action urging WhatsApp chat",
-      "hashtags": ["#Sylhet", "#LittleBigHelp", "...3-5 more relevant tags"],
+      "bodyCopy": "Clear, well-structured body with clean bullet points (using • or ✓) emphasizing care and transparent pricing",
+      "callToAction": "Specific call to action inviting WhatsApp or form inquiry",
+      "hashtags": ["#AlloraSylhet", "#LifeMadeLighter", "...3-5 more relevant tags"],
       "recommendedGraphic": {
         "headline": "Banner headline text",
         "subhead": "Banner subhead text",
-        "accentColor": "#F26A5A",
-        "bgColor": "#2C3E50",
-        "textColor": "#FFFFFF",
-        "badgeText": "Short badge text like 'Trusted in Sylhet' or 'Fast Delivery'"
+        "accentColor": "#B49A70",
+        "bgColor": "#172C27",
+        "textColor": "#F4F0E7",
+        "badgeText": "Short badge text like 'Sylhet Concierge' or 'Personal Assistance'"
       }
     }
   ]
@@ -913,7 +1005,7 @@ app.post('/api/campaigns', requireAdmin, async (req, res) => {
   const newCampaign = {
     id: 'camp-' + Date.now().toString(36) + crypto.randomBytes(3).toString('hex'),
     title: req.body.title || 'Untitled Campaign',
-    serviceCategory: req.body.serviceCategory || 'Everyday Help',
+    serviceCategory: req.body.serviceCategory || 'Personal Concierge',
     targetAudience: req.body.targetAudience || 'General Audience',
     goal: req.body.goal || 'General Awareness',
     aspectRatio: req.body.aspectRatio || '1:1',
@@ -923,12 +1015,12 @@ app.post('/api/campaigns', requireAdmin, async (req, res) => {
     callToAction: req.body.callToAction || '',
     hashtags: req.body.hashtags || [],
     graphicData: req.body.graphicData || {
-      headline: req.body.headline || 'Little Big Help',
-      subhead: 'Small Tasks, Big Relief',
-      accentColor: '#F26A5A',
-      bgColor: '#2C3E50',
-      textColor: '#FFFFFF',
-      badgeText: 'Sylhet Service'
+      headline: req.body.headline || 'ALLORA',
+      subhead: 'Life, made lighter.',
+      accentColor: '#B49A70',
+      bgColor: '#172C27',
+      textColor: '#F4F0E7',
+      badgeText: 'Sylhet Concierge'
     },
     customGraphicImage: req.body.customGraphicImage || null,
     status: 'draft',
@@ -1117,6 +1209,122 @@ app.post('/api/campaigns/:id/schedule', requireAdmin, async (req, res) => {
 
   await persistCampaign(campaign);
   return res.json({ success: true, campaign });
+});
+
+// ----------------- CUSTOMER INQUIRIES (Public Submit + Admin Management) -----------------
+const VALID_INQUIRY_STATUSES = ['new', 'in_review', 'confirmed', 'completed', 'archived'];
+
+function clampString(val, maxLen) {
+  if (typeof val !== 'string') return '';
+  return val.trim().slice(0, maxLen);
+}
+
+app.post('/api/inquiries', async (req, res) => {
+  try {
+    const customerName = clampString(req.body?.customerName, 120);
+    const whatsappNumber = clampString(req.body?.whatsappNumber, 40);
+    const email = clampString(req.body?.email, 160);
+    const serviceCategory = clampString(req.body?.serviceCategory, 100);
+    const location = clampString(req.body?.location, 200);
+    const preferredDate = clampString(req.body?.preferredDate, 60);
+    const urgency = clampString(req.body?.urgency, 100);
+    const taskDescription = clampString(req.body?.taskDescription, 3000);
+    const additionalDetails = clampString(req.body?.additionalDetails, 2000);
+    const businessName = clampString(req.body?.businessName, 120);
+    const existingWebsite = clampString(req.body?.existingWebsite, 200);
+    const websiteType = clampString(req.body?.websiteType, 200);
+    const includeMaintenance = Boolean(req.body?.includeMaintenance);
+
+    if (!customerName) {
+      return res.status(400).json({ success: false, error: 'Customer name is required.' });
+    }
+    if (!whatsappNumber || whatsappNumber.length < 5) {
+      return res.status(400).json({ success: false, error: 'A valid WhatsApp number is required.' });
+    }
+    if (!serviceCategory) {
+      return res.status(400).json({ success: false, error: 'Service category is required.' });
+    }
+    if (!taskDescription) {
+      return res.status(400).json({ success: false, error: 'Task description is required.' });
+    }
+
+    const nowIso = new Date().toISOString();
+    const inquiry = {
+      id: 'inq-' + Date.now().toString(36) + crypto.randomBytes(3).toString('hex'),
+      customerName,
+      whatsappNumber,
+      email,
+      serviceCategory,
+      location,
+      preferredDate,
+      urgency: urgency || 'Standard',
+      taskDescription,
+      additionalDetails,
+      businessName,
+      existingWebsite,
+      websiteType,
+      includeMaintenance,
+      status: 'new',
+      adminNotes: '',
+      createdAt: nowIso,
+      updatedAt: nowIso
+    };
+
+    await persistInquiry(inquiry);
+    return res.status(201).json({ success: true, inquiry });
+  } catch (err) {
+    console.error('[Inquiries] Submission error:', err);
+    return res.status(500).json({ success: false, error: 'Failed to record inquiry. Please try again.' });
+  }
+});
+
+app.get('/api/inquiries', requireAdmin, async (req, res) => {
+  const inquiries = await getStoredInquiries();
+  return res.json({ success: true, inquiries, storage: firestoreStatus });
+});
+
+async function handleUpdateInquiry(req, res) {
+  const inquiries = await getStoredInquiries();
+  const index = inquiries.findIndex(i => i.id === req.params.id);
+  if (index === -1) {
+    return res.status(404).json({ success: false, error: 'Inquiry not found' });
+  }
+
+  const existing = inquiries[index];
+  const nextStatus = req.body?.status !== undefined ? String(req.body.status).trim() : existing.status;
+  if (!VALID_INQUIRY_STATUSES.includes(nextStatus)) {
+    return res.status(400).json({
+      success: false,
+      error: `Invalid inquiry status. Allowed values: ${VALID_INQUIRY_STATUSES.join(', ')}`
+    });
+  }
+
+  const nextNotes = req.body?.adminNotes !== undefined
+    ? clampString(req.body.adminNotes, 2000)
+    : (existing.adminNotes || '');
+
+  const updated = {
+    ...existing,
+    status: nextStatus,
+    adminNotes: nextNotes,
+    updatedAt: new Date().toISOString()
+  };
+
+  await persistInquiry(updated);
+  return res.json({ success: true, inquiry: updated });
+}
+
+app.patch('/api/inquiries/:id', requireAdmin, handleUpdateInquiry);
+app.put('/api/inquiries/:id', requireAdmin, handleUpdateInquiry);
+
+app.delete('/api/inquiries/:id', requireAdmin, async (req, res) => {
+  const inquiries = await getStoredInquiries();
+  const exists = inquiries.some(i => i.id === req.params.id);
+  if (!exists) {
+    return res.status(404).json({ success: false, error: 'Inquiry not found' });
+  }
+  await removeStoredInquiry(req.params.id);
+  return res.json({ success: true, message: 'Inquiry deleted' });
 });
 
 // ----------------- SOCIAL ACCOUNTS / META CONFIG (Priority 3: v26.0) -----------------
@@ -1712,24 +1920,33 @@ app.get('/admin.html', async (req, res) => {
   return res.redirect('/admin');
 });
 
+// Global process safety handlers
+process.on('unhandledRejection', (reason) => {
+  console.warn('[Server Warning] Unhandled Promise Rejection:', reason?.message || reason);
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('[Server Error] Uncaught Exception:', err.message || err);
+});
+
 // ----------------- VITE INTEGRATION -----------------
 async function startServer() {
   const isProd = process.env.NODE_ENV === 'production';
   const httpServer = http.createServer(app);
 
-  // Verify and sync persistent cloud storage on startup
-  try {
-    const initialCampaigns = await getStoredCampaigns();
-    console.log(`[Storage] Verified persistent cloud storage: ${initialCampaigns.length} campaigns online.`);
-  } catch (err) {
-    console.warn('[Storage] Startup storage sync notice:', err.message);
-  }
+  httpServer.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.error(`[Server Error] Port ${PORT} is already in use.`);
+    } else {
+      console.error('[Server Error]:', err.message);
+    }
+  });
 
   if (!isProd) {
     const vite = await createViteServer({
       server: {
         middlewareMode: true,
-        host: '0.0.0.0',
+        host: HOST,
         port: PORT,
         allowedHosts: true,
         hmr: {
@@ -1748,8 +1965,17 @@ async function startServer() {
     });
   }
 
-  httpServer.listen(PORT, '0.0.0.0', () => {
-    console.log(`Little Big Help Server running at http://0.0.0.0:${PORT}`);
+  httpServer.listen(PORT, HOST, () => {
+    console.log(`ALLORA Server running at http://${HOST}:${PORT}`);
+
+    // Asynchronously verify and sync persistent cloud storage in background without blocking server listen
+    Promise.all([getStoredCampaigns(), getStoredInquiries()])
+      .then(([initialCampaigns, initialInquiries]) => {
+        console.log(`[Storage] Verified persistent cloud storage: ${initialCampaigns.length} campaigns, ${initialInquiries.length} inquiries online.`);
+      })
+      .catch(err => {
+        console.warn('[Storage] Startup storage sync notice:', err.message);
+      });
   });
 }
 

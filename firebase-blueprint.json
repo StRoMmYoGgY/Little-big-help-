@@ -2,7 +2,7 @@
   "entities": {
     "Campaign": {
       "title": "Campaign",
-      "description": "Marketing campaign draft or published post for Little Big Help",
+      "description": "Marketing campaign draft or published post for ALLORA",
       "type": "object",
       "properties": {
         "id": {
@@ -15,7 +15,7 @@
         },
         "serviceCategory": {
           "type": "string",
-          "description": "Service category (e.g. Everyday Help, Local Assistance, Website Design)"
+          "description": "Service category (e.g. Personal Concierge, Local Assistance, Business Support, Digital Solutions)"
         },
         "targetAudience": {
           "type": "string",
@@ -31,7 +31,7 @@
         },
         "headline": {
           "type": "string",
-          "description": "Punchy headline for visual banner"
+          "description": "Editorial headline for visual banner"
         },
         "hook": {
           "type": "string",
@@ -62,6 +62,78 @@
         }
       },
       "required": ["id", "title", "status", "createdAt"]
+    },
+    "Inquiry": {
+      "title": "Inquiry",
+      "description": "Customer service and concierge inquiry submitted through ALLORA website",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of the customer inquiry"
+        },
+        "customerName": {
+          "type": "string",
+          "maxLength": 120,
+          "description": "Name of the customer or business"
+        },
+        "whatsappNumber": {
+          "type": "string",
+          "maxLength": 40,
+          "description": "Customer WhatsApp contact number"
+        },
+        "email": {
+          "type": "string",
+          "maxLength": 160,
+          "description": "Optional email address"
+        },
+        "serviceCategory": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Requested service category"
+        },
+        "location": {
+          "type": "string",
+          "maxLength": 200,
+          "description": "City, neighborhood, or coordination area"
+        },
+        "taskDescription": {
+          "type": "string",
+          "maxLength": 3000,
+          "description": "Primary description of the requested task or assistance"
+        },
+        "preferredDate": {
+          "type": "string",
+          "maxLength": 60,
+          "description": "Preferred date or timeline"
+        },
+        "additionalDetails": {
+          "type": "string",
+          "maxLength": 2000,
+          "description": "Additional context, notes, or website scope details"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["new", "in_review", "confirmed", "completed", "archived"],
+          "description": "Inquiry handling status"
+        },
+        "adminNotes": {
+          "type": "string",
+          "maxLength": 2000,
+          "description": "Internal coordinator notes"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Submission timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last update timestamp"
+        }
+      },
+      "required": ["id", "customerName", "whatsappNumber", "serviceCategory", "taskDescription", "status", "createdAt"]
     },
     "Setting": {
       "title": "Setting",
@@ -124,6 +196,10 @@
     "/campaigns/{campaignId}": {
       "schema": "Campaign",
       "description": "Stores all marketing campaigns, creative content, and publication states"
+    },
+    "/inquiries/{inquiryId}": {
+      "schema": "Inquiry",
+      "description": "Stores customer service inquiries submitted from the ALLORA website"
     },
     "/settings/{settingId}": {
       "schema": "Setting",

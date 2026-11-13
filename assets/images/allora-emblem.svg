@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none" role="img" aria-label="ALLORA monogram emblem">
+  <rect width="120" height="120" rx="22" fill="#172C27" />
+  <rect x="7" y="7" width="106" height="106" rx="16" stroke="#B49A70" stroke-opacity="0.45" stroke-width="1.5" />
+  <path d="M32 90V55C32 39.536 44.536 27 60 27C75.464 27 88 39.536 88 55V90" stroke="#B49A70" stroke-width="2" />
+  <path d="M60 36L41.5 84H49.2L53.6 72H66.4L70.8 84H78.5L60 36ZM55.8 65.5L60 53.5L64.2 65.5H55.8Z" fill="#F4F0E7" />
+  <circle cx="60" cy="27" r="2.5" fill="#B49A70" />
+</svg>

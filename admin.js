@@ -1,14 +1,18 @@
-// Little Big Help - AI Marketing Dashboard & Social Publishing System
-// Client controller for private administrator area
+// ALLORA - Concierge Operations & AI Marketing Dashboard
+// Client controller for private administrator workspace
 
-// Clean up any legacy token in localStorage; session is strictly handled via httpOnly cookie
+import alloraEmblemUrl from './assets/images/allora-emblem.svg';
+
+// Clean up any legacy token in localStorage; session is handled via httpOnly cookie / sessionStorage
 try {
   localStorage.removeItem('lbh_admin_token');
 } catch (_) {}
 
 let currentAdminUser = null;
 let allCampaigns = [];
+let allInquiries = [];
 let activeCampaign = null;
+let activeInquiry = null;
 let metaSettings = null;
 let customImageObj = null;
 
@@ -24,7 +28,6 @@ const btnLogin = document.getElementById('btn-login');
 const pageTitle = document.getElementById('page-title');
 const pageBreadcrumb = document.getElementById('page-breadcrumb');
 const topbarMetaStatus = document.getElementById('topbar-meta-status');
-const topbarMetaText = document.getElementById('topbar-meta-text');
 const navMetaDot = document.getElementById('nav-meta-dot');
 const globalAlertContainer = document.getElementById('global-alert-container');
 
@@ -32,15 +35,14 @@ const globalAlertContainer = document.getElementById('global-alert-container');
 const canvasFb = document.getElementById('banner-canvas');
 const canvasIg = document.getElementById('banner-canvas-ig');
 
-// Initialize Brand Logo for Canvas
+// Initialize Brand Emblem for Canvas
 const brandLogoImg = new Image();
-brandLogoImg.src = '/assets/images/interlocking-relief-social-tile.png';
+brandLogoImg.src = alloraEmblemUrl;
 brandLogoImg.onload = () => {
   renderCanvas();
 };
 
-// ----------------- AUTHENTICATION (Priority 1) -----------------
-// Centralized authenticated fetch with credentials (httpOnly cookie + Bearer token fallback)
+// ----------------- AUTHENTICATION -----------------
 async function authFetch(url, options = {}) {
   const headers = { ...(options.headers || {}) };
   const storedToken = sessionStorage.getItem('lbh_admin_token');
@@ -61,7 +63,6 @@ async function authFetch(url, options = {}) {
     }
     return res;
   } catch (err) {
-    // Network error: do NOT automatically log out
     console.error('Network request failed:', err);
     showAlert('Network error communicating with server: ' + err.message, 'danger');
     throw err;
@@ -82,13 +83,12 @@ async function checkAuth() {
     });
 
     if (res.status === 401) {
-      // Confirmed unauthorized session: redirect to login
       window.location.href = '/admin';
       return;
     }
 
     const data = await res.json();
-    
+
     if (data.authenticated && data.user) {
       authRetryCount = 0;
       currentAdminUser = data.user;
@@ -99,7 +99,6 @@ async function checkAuth() {
     }
   } catch (err) {
     console.warn('Network issue verifying session, retrying:', err);
-    // Do NOT redirect or log out on network glitch to avoid sign-in redirect loops
     authRetryCount++;
     if (authRetryCount < 4) {
       setTimeout(checkAuth, 2500);
@@ -107,10 +106,6 @@ async function checkAuth() {
       showAlert('Unable to reach server. Please check your internet connection.', 'warning');
     }
   }
-}
-
-function showAuthScreen() {
-  window.location.href = '/admin';
 }
 
 function showAdminApp() {
@@ -170,7 +165,7 @@ if (loginForm) {
       currentAdminUser = data.user;
       showAdminApp();
       loadInitialData();
-      showAlert('Welcome, Administrator! You are securely authenticated.', 'success');
+      showAlert('Welcome back. You are securely signed in to the ALLORA workspace.', 'success');
     } catch (err) {
       loginError.textContent = err.message;
       loginError.classList.remove('hidden');
@@ -188,11 +183,12 @@ const tabButtons = document.querySelectorAll('.nav-btn');
 const tabPanes = document.querySelectorAll('.tab-pane');
 
 const TAB_TITLES = {
-  'tab-overview': { title: 'Marketing Overview', crumb: 'Dashboard / Overview' },
-  'tab-create': { title: 'AI Campaign Generator', crumb: 'Dashboard / AI Creator' },
-  'tab-campaigns': { title: 'Campaigns & Drafts', crumb: 'Dashboard / Campaigns' },
-  'tab-editor': { title: 'Campaign Editor & Approval', crumb: 'Dashboard / Editor & Social Mockups' },
-  'tab-social-accounts': { title: 'Social Accounts & Meta API', crumb: 'Dashboard / Meta Publishing' }
+  'tab-overview': { title: 'Workspace Overview', crumb: 'ALLORA / Overview' },
+  'tab-inquiries': { title: 'Customer Inquiries', crumb: 'ALLORA / Customer Inquiries' },
+  'tab-create': { title: 'AI Campaign Generator', crumb: 'ALLORA / AI Creator' },
+  'tab-campaigns': { title: 'Campaigns & Drafts', crumb: 'ALLORA / Campaigns' },
+  'tab-editor': { title: 'Campaign Editor & Approval', crumb: 'ALLORA / Editor & Social Mockups' },
+  'tab-social-accounts': { title: 'Social & Settings', crumb: 'ALLORA / Meta & Configuration' }
 };
 
 function switchTab(tabId) {
@@ -224,11 +220,16 @@ document.getElementById('btn-quick-create').addEventListener('click', () => {
   switchTab('tab-create');
 });
 
+const btnViewAllInquiries = document.getElementById('btn-view-all-inquiries');
+if (btnViewAllInquiries) {
+  btnViewAllInquiries.addEventListener('click', () => switchTab('tab-inquiries'));
+}
+
 // ----------------- GLOBAL ALERTS -----------------
 function showAlert(message, type = 'info', timeoutMs = 6000) {
   const alertEl = document.createElement('div');
   alertEl.className = `alert alert-${type}`;
-  alertEl.innerHTML = `<strong>${type.toUpperCase()}:</strong> ${message}`;
+  alertEl.innerHTML = `<strong>${escapeHtml(type.toUpperCase())}:</strong> ${escapeHtml(message)}`;
   globalAlertContainer.appendChild(alertEl);
 
   setTimeout(() => {
@@ -242,9 +243,250 @@ function showAlert(message, type = 'info', timeoutMs = 6000) {
 async function loadInitialData() {
   await Promise.all([
     fetchCampaigns(),
+    fetchInquiries(),
     fetchMetaSettings()
   ]);
 }
+
+// ----------------- CUSTOMER INQUIRIES API -----------------
+const INQUIRY_STATUS_LABELS = {
+  new: 'New',
+  in_review: 'In Review',
+  confirmed: 'Confirmed',
+  completed: 'Completed',
+  archived: 'Archived'
+};
+
+async function fetchInquiries() {
+  try {
+    const res = await authFetch('/api/inquiries');
+    const data = await res.json();
+    if (data.success && Array.isArray(data.inquiries)) {
+      allInquiries = data.inquiries;
+      updateInquiryStats();
+      renderOverviewInquiries();
+      renderInquiriesTable();
+    }
+  } catch (err) {
+    console.error('Error fetching inquiries:', err);
+  }
+}
+
+function updateInquiryStats() {
+  const newCount = allInquiries.filter(i => i.status === 'new').length;
+  const statEl = document.getElementById('stat-inquiries');
+  const badgeEl = document.getElementById('badge-total-inquiries');
+  if (statEl) statEl.textContent = newCount;
+  if (badgeEl) badgeEl.textContent = allInquiries.length;
+}
+
+function renderOverviewInquiries() {
+  const tbody = document.getElementById('overview-inquiries-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  if (allInquiries.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted">No customer inquiries submitted yet. Requests submitted on the ALLORA website appear here automatically.</td></tr>';
+    return;
+  }
+
+  allInquiries.slice(0, 5).forEach(inq => {
+    const tr = document.createElement('tr');
+    const statusLabel = INQUIRY_STATUS_LABELS[inq.status] || inq.status;
+    tr.innerHTML = `
+      <td>
+        <strong>${escapeHtml(inq.customerName)}</strong>
+        <div class="text-xs text-muted">${escapeHtml(inq.whatsappNumber)}</div>
+      </td>
+      <td>
+        <span class="badge badge-outline">${escapeHtml(inq.serviceCategory)}</span>
+        <div class="text-xs text-muted mt-1">${escapeHtml(inq.location || 'Sylhet')}</div>
+      </td>
+      <td><span class="text-xs text-muted">${escapeHtml(inq.preferredDate || 'Flexible')}</span></td>
+      <td><span class="badge badge-inq-${escapeHtml(inq.status)}">${escapeHtml(statusLabel)}</span></td>
+      <td><span class="text-xs text-muted">${new Date(inq.createdAt).toLocaleDateString()}</span></td>
+      <td>
+        <button class="btn btn-outline btn-sm btn-view-inquiry" data-id="${escapeHtml(inq.id)}">Review</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  tbody.querySelectorAll('.btn-view-inquiry').forEach(btn => {
+    btn.addEventListener('click', () => openInquiryModal(btn.dataset.id));
+  });
+}
+
+function renderInquiriesTable() {
+  const tbody = document.getElementById('inquiries-list-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  const statusFilter = document.getElementById('inquiry-filter-status')?.value || 'all';
+  const searchQuery = (document.getElementById('inquiry-search-input')?.value || '').trim().toLowerCase();
+
+  const filtered = allInquiries.filter(inq => {
+    const matchesStatus = statusFilter === 'all' || inq.status === statusFilter;
+    const haystack = [
+      inq.customerName,
+      inq.whatsappNumber,
+      inq.email,
+      inq.serviceCategory,
+      inq.location,
+      inq.taskDescription
+    ].join(' ').toLowerCase();
+    const matchesSearch = !searchQuery || haystack.includes(searchQuery);
+    return matchesStatus && matchesSearch;
+  });
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-muted">No matching inquiries found.</td></tr>';
+    return;
+  }
+
+  filtered.forEach(inq => {
+    const tr = document.createElement('tr');
+    const statusLabel = INQUIRY_STATUS_LABELS[inq.status] || inq.status;
+    const truncatedDesc = inq.taskDescription.length > 90
+      ? inq.taskDescription.slice(0, 90) + '...'
+      : inq.taskDescription;
+
+    tr.innerHTML = `
+      <td>
+        <strong>${escapeHtml(inq.customerName)}</strong>
+        <div class="text-xs text-muted">${escapeHtml(inq.whatsappNumber)}</div>
+        ${inq.email ? `<div class="text-xs text-muted">${escapeHtml(inq.email)}</div>` : ''}
+      </td>
+      <td>
+        <span class="badge badge-outline">${escapeHtml(inq.serviceCategory)}</span>
+        <div class="text-xs text-muted mt-1">${escapeHtml(inq.location || 'Sylhet / Unspecified')}</div>
+      </td>
+      <td><span class="text-xs">${escapeHtml(truncatedDesc)}</span></td>
+      <td><span class="text-xs text-muted">${escapeHtml(inq.preferredDate || 'Flexible')}</span></td>
+      <td><span class="badge badge-inq-${escapeHtml(inq.status)}">${escapeHtml(statusLabel)}</span></td>
+      <td><span class="text-xs text-muted">${new Date(inq.createdAt).toLocaleString()}</span></td>
+      <td>
+        <button class="btn btn-outline btn-sm btn-open-inquiry" data-id="${escapeHtml(inq.id)}">Manage</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  tbody.querySelectorAll('.btn-open-inquiry').forEach(btn => {
+    btn.addEventListener('click', () => openInquiryModal(btn.dataset.id));
+  });
+}
+
+function openInquiryModal(id) {
+  const inquiry = allInquiries.find(i => i.id === id);
+  if (!inquiry) return;
+  activeInquiry = inquiry;
+
+  const modal = document.getElementById('modal-inquiry');
+  const metaGrid = document.getElementById('inquiry-modal-meta');
+  const descBox = document.getElementById('inquiry-modal-description');
+  const addWrap = document.getElementById('inquiry-modal-additional-wrap');
+  const addBox = document.getElementById('inquiry-modal-additional');
+  const digWrap = document.getElementById('inquiry-modal-digital-wrap');
+  const digBox = document.getElementById('inquiry-modal-digital');
+  const statusSelect = document.getElementById('inquiry-modal-status');
+  const notesInput = document.getElementById('inquiry-admin-notes');
+  const waBtn = document.getElementById('btn-inquiry-whatsapp');
+
+  document.getElementById('inquiry-modal-heading').textContent = `Inquiry: ${inquiry.customerName}`;
+  metaGrid.innerHTML = `
+    <div class="inquiry-detail-item"><strong>Customer</strong><span>${escapeHtml(inquiry.customerName)}</span></div>
+    <div class="inquiry-detail-item"><strong>WhatsApp</strong><span>${escapeHtml(inquiry.whatsappNumber)}</span></div>
+    <div class="inquiry-detail-item"><strong>Email</strong><span>${escapeHtml(inquiry.email || 'Not provided')}</span></div>
+    <div class="inquiry-detail-item"><strong>Service Category</strong><span>${escapeHtml(inquiry.serviceCategory)}</span></div>
+    <div class="inquiry-detail-item"><strong>Location</strong><span>${escapeHtml(inquiry.location || 'Not specified')}</span></div>
+    <div class="inquiry-detail-item"><strong>Date &amp; Priority</strong><span>${escapeHtml(inquiry.preferredDate || 'Flexible')}${inquiry.urgency && inquiry.urgency !== 'Standard' ? ' · ' + escapeHtml(inquiry.urgency) : ''}</span></div>
+  `;
+
+  descBox.textContent = inquiry.taskDescription || '';
+
+  if (inquiry.additionalDetails) {
+    addWrap.classList.remove('hidden');
+    addBox.textContent = inquiry.additionalDetails;
+  } else {
+    addWrap.classList.add('hidden');
+  }
+
+  const hasDigitalDetails = inquiry.businessName || inquiry.existingWebsite || inquiry.websiteType || inquiry.includeMaintenance;
+  if (hasDigitalDetails) {
+    digWrap.classList.remove('hidden');
+    const parts = [];
+    if (inquiry.businessName) parts.push(`Business: ${inquiry.businessName}`);
+    if (inquiry.existingWebsite) parts.push(`Existing URL: ${inquiry.existingWebsite}`);
+    if (inquiry.websiteType) parts.push(`Scope: ${inquiry.websiteType}`);
+    parts.push(`Ongoing Maintenance: ${inquiry.includeMaintenance ? 'Requested' : 'No'}`);
+    digBox.textContent = parts.join('\n');
+  } else {
+    digWrap.classList.add('hidden');
+  }
+
+  statusSelect.value = inquiry.status || 'new';
+  notesInput.value = inquiry.adminNotes || '';
+
+  const digits = (inquiry.whatsappNumber || '').replace(/[^\d]/g, '');
+  const waTarget = digits.length >= 7 ? digits : '8801865383565';
+  const replyGreeting = `Hello ${inquiry.customerName}, thank you for reaching out to ALLORA regarding ${inquiry.serviceCategory}. We have reviewed your request and would love to confirm details and pricing with you.`;
+  waBtn.href = `https://wa.me/${waTarget}?text=${encodeURIComponent(replyGreeting)}`;
+
+  modal.classList.remove('hidden');
+}
+
+document.getElementById('inquiry-filter-status')?.addEventListener('change', renderInquiriesTable);
+document.getElementById('inquiry-search-input')?.addEventListener('input', renderInquiriesTable);
+document.getElementById('btn-refresh-inquiries')?.addEventListener('click', fetchInquiries);
+
+document.getElementById('btn-save-inquiry')?.addEventListener('click', async () => {
+  if (!activeInquiry) return;
+  const status = document.getElementById('inquiry-modal-status').value;
+  const adminNotes = document.getElementById('inquiry-admin-notes').value.trim();
+
+  try {
+    const res = await authFetch(`/api/inquiries/${encodeURIComponent(activeInquiry.id)}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status, adminNotes })
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.error || 'Failed to update inquiry');
+    }
+
+    document.getElementById('modal-inquiry').classList.add('hidden');
+    showAlert(`Inquiry updated (${INQUIRY_STATUS_LABELS[status] || status}).`, 'success');
+    await fetchInquiries();
+  } catch (err) {
+    showAlert('Error updating inquiry: ' + err.message, 'danger');
+  }
+});
+
+document.getElementById('btn-delete-inquiry')?.addEventListener('click', async () => {
+  if (!activeInquiry) return;
+  if (!confirm(`Delete inquiry from ${activeInquiry.customerName}? This cannot be undone.`)) {
+    return;
+  }
+
+  try {
+    const res = await authFetch(`/api/inquiries/${encodeURIComponent(activeInquiry.id)}`, {
+      method: 'DELETE'
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.error || 'Failed to delete inquiry');
+    }
+
+    document.getElementById('modal-inquiry').classList.add('hidden');
+    activeInquiry = null;
+    showAlert('Inquiry deleted.', 'info');
+    await fetchInquiries();
+  } catch (err) {
+    showAlert('Error deleting inquiry: ' + err.message, 'danger');
+  }
+});
 
 // ----------------- CAMPAIGNS API -----------------
 async function fetchCampaigns() {
@@ -256,8 +498,7 @@ async function fetchCampaigns() {
       updateStats();
       renderOverviewTable();
       renderCampaignsTable();
-      
-      // If no active campaign, default to the first one
+
       if (!activeCampaign && allCampaigns.length > 0) {
         setActiveCampaign(allCampaigns[0]);
       }
@@ -295,11 +536,11 @@ function renderOverviewTable() {
     tr.innerHTML = `
       <td><strong>${escapeHtml(c.title)}</strong></td>
       <td><span class="badge badge-outline">${escapeHtml(c.serviceCategory)}</span></td>
-      <td>${c.platforms.map(p => `<span class="badge">${p}</span>`).join(' ')}</td>
-      <td><span class="badge badge-${c.status}">${c.status.toUpperCase()}</span></td>
+      <td>${(c.platforms || []).map(p => `<span class="badge">${escapeHtml(p)}</span>`).join(' ')}</td>
+      <td><span class="badge badge-${escapeHtml(c.status)}">${escapeHtml(c.status.toUpperCase())}</span></td>
       <td>
-        ${c.approval?.approved 
-          ? `<span class="badge badge-approved">✓ Approved</span>` 
+        ${c.approval?.approved
+          ? `<span class="badge badge-approved">&check; Approved</span>`
           : `<span class="badge badge-draft">Pending Review</span>`}
       </td>
       <td>
@@ -308,7 +549,7 @@ function renderOverviewTable() {
         </span>
       </td>
       <td>
-        <button class="btn btn-outline btn-sm btn-edit-campaign" data-id="${c.id}">Edit</button>
+        <button class="btn btn-outline btn-sm btn-edit-campaign" data-id="${escapeHtml(c.id)}">Edit</button>
       </td>
     `;
     tbody.appendChild(tr);
@@ -330,8 +571,8 @@ function renderCampaignsTable() {
   tbody.innerHTML = '';
 
   const filterStatus = document.getElementById('campaign-filter-status').value;
-  const filtered = filterStatus === 'all' 
-    ? allCampaigns 
+  const filtered = filterStatus === 'all'
+    ? allCampaigns
     : allCampaigns.filter(c => c.status === filterStatus);
 
   if (filtered.length === 0) {
@@ -343,26 +584,26 @@ function renderCampaignsTable() {
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>
-        <div class="table-thumb" style="background:${c.graphicData?.bgColor || '#2C3E50'}; display:flex; align-items:center; justify-content:center; color:#fff; font-size:10px; font-weight:700;">
-          LBH
+        <div class="table-thumb" style="background:${escapeHtml(c.graphicData?.bgColor || '#172C27')}; display:flex; align-items:center; justify-content:center; color:#F4F0E7; font-family:'Cormorant Garamond',serif; font-size:16px; font-weight:600;">
+          A
         </div>
       </td>
       <td>
         <strong>${escapeHtml(c.title)}</strong>
         <div class="text-xs text-muted">${escapeHtml(c.serviceCategory)}</div>
       </td>
-      <td>${c.platforms.map(p => `<span class="badge">${p}</span>`).join(' ')}</td>
+      <td>${(c.platforms || []).map(p => `<span class="badge">${escapeHtml(p)}</span>`).join(' ')}</td>
       <td>
-        ${c.approval?.approved 
-          ? `<span class="badge badge-approved">✓ Approved (${new Date(c.approval.approvedAt).toLocaleDateString()})</span>` 
+        ${c.approval?.approved
+          ? `<span class="badge badge-approved">&check; Approved (${new Date(c.approval.approvedAt).toLocaleDateString()})</span>`
           : `<span class="badge badge-draft">Draft</span>`}
       </td>
-      <td><span class="badge badge-${c.status}">${c.status.toUpperCase()}</span></td>
+      <td><span class="badge badge-${escapeHtml(c.status)}">${escapeHtml(c.status.toUpperCase())}</span></td>
       <td><span class="text-xs text-muted">${new Date(c.updatedAt).toLocaleString()}</span></td>
       <td>
         <div style="display:flex; gap:6px;">
-          <button class="btn btn-outline btn-sm btn-open-editor" data-id="${c.id}">Edit</button>
-          <button class="btn btn-ghost-danger btn-sm btn-delete-campaign" data-id="${c.id}">Delete</button>
+          <button class="btn btn-outline btn-sm btn-open-editor" data-id="${escapeHtml(c.id)}">Edit</button>
+          <button class="btn btn-ghost-danger btn-sm btn-delete-campaign" data-id="${escapeHtml(c.id)}">Delete</button>
         </div>
       </td>
     `;
@@ -390,11 +631,14 @@ function renderCampaignsTable() {
 
 document.getElementById('campaign-filter-status').addEventListener('change', renderCampaignsTable);
 document.getElementById('btn-refresh-campaigns').addEventListener('click', fetchCampaigns);
-document.getElementById('btn-refresh-overview').addEventListener('click', fetchCampaigns);
+document.getElementById('btn-refresh-overview').addEventListener('click', () => {
+  fetchCampaigns();
+  fetchInquiries();
+});
 
 async function deleteCampaign(id) {
   try {
-    const res = await authFetch(`/api/campaigns/${id}`, {
+    const res = await authFetch(`/api/campaigns/${encodeURIComponent(id)}`, {
       method: 'DELETE'
     });
     if (res.ok) {
@@ -444,7 +688,7 @@ aiForm.addEventListener('submit', async (e) => {
     }
 
     renderAiVariations(data.data, payload);
-    showAlert('Successfully generated 3 marketing campaign variations!', 'success');
+    showAlert('Generated 3 campaign variations for ALLORA.', 'success');
   } catch (err) {
     console.error('AI generation error:', err);
     showAlert('AI Generation error: ' + err.message, 'danger');
@@ -467,9 +711,9 @@ function renderAiVariations(data, formInputs) {
     card.className = 'variation-card';
     card.innerHTML = `
       <div class="variation-header">
-        <span class="variation-name">Variation ${index + 1}: ${escapeHtml(v.variationName || 'Angle')}</span>
+        <span class="variation-name">Variation ${index + 1}: ${escapeHtml(v.variationName || 'Concept')}</span>
         <button class="btn btn-primary btn-sm btn-use-variation" data-index="${index}">
-          Load Into Editor →
+          Load Into Editor &rarr;
         </button>
       </div>
       <div class="variation-headline">"${escapeHtml(v.headline)}"</div>
@@ -488,7 +732,6 @@ function renderAiVariations(data, formInputs) {
       const idx = parseInt(btn.dataset.index, 10);
       const chosen = variations[idx];
 
-      // Create new draft campaign
       const newCamp = {
         title: `${formInputs.serviceCategory} - ${chosen.variationName || 'Campaign'}`,
         serviceCategory: formInputs.serviceCategory,
@@ -499,14 +742,14 @@ function renderAiVariations(data, formInputs) {
         hook: chosen.hook,
         bodyCopy: chosen.bodyCopy,
         callToAction: chosen.callToAction,
-        hashtags: chosen.hashtags || ['#Sylhet', '#LittleBigHelp'],
+        hashtags: chosen.hashtags || ['#ALLORA', '#Sylhet', '#LifeMadeLighter'],
         graphicData: chosen.recommendedGraphic || {
           headline: chosen.headline,
-          subhead: 'Little Big Help • Sylhet',
-          accentColor: '#F26A5A',
-          bgColor: '#2C3E50',
-          textColor: '#FFFFFF',
-          badgeText: 'Verified Local Service'
+          subhead: 'ALLORA • Sylhet',
+          accentColor: '#B49A70',
+          bgColor: '#172C27',
+          textColor: '#F4F0E7',
+          badgeText: 'Sylhet Concierge'
         },
         platforms: ['facebook', 'instagram']
       };
@@ -525,7 +768,7 @@ function renderAiVariations(data, formInputs) {
           renderOverviewTable();
           setActiveCampaign(d.campaign);
           switchTab('tab-editor');
-          showAlert('Loaded into Editor. Please review, edit, and approve when ready.', 'success');
+          showAlert('Loaded into Editor. Review, refine, and approve when ready.', 'success');
         }
       } catch (err) {
         showAlert('Error creating campaign: ' + err.message, 'danger');
@@ -542,7 +785,7 @@ function setActiveCampaign(c) {
   document.getElementById('editor-campaign-title').value = activeCampaign.title || '';
   document.getElementById('editor-status-badge').className = `badge badge-${activeCampaign.status}`;
   document.getElementById('editor-status-badge').textContent = `Status: ${activeCampaign.status.toUpperCase()}`;
-  
+
   const approvalBadge = document.getElementById('editor-approval-badge');
   const btnApproval = document.getElementById('btn-toggle-approval');
   const btnPublish = document.getElementById('btn-open-publish-modal');
@@ -558,7 +801,7 @@ function setActiveCampaign(c) {
     btnSchedule.disabled = false;
     callout.className = 'approval-callout approved';
     callout.innerHTML = `
-      <div class="callout-icon">✅</div>
+      <div class="callout-icon">&check;</div>
       <div class="callout-body">
         <strong>Campaign Approved</strong>
         <p>Approved by ${escapeHtml(activeCampaign.approval.approvedBy || 'Admin')} on ${new Date(activeCampaign.approval.approvedAt).toLocaleDateString()}. Publishing and scheduling controls are unlocked.</p>
@@ -568,15 +811,15 @@ function setActiveCampaign(c) {
     approvalBadge.className = 'badge badge-draft';
     approvalBadge.textContent = 'Unapproved';
     btnApproval.className = 'btn btn-warning';
-    btnApproval.textContent = '🛡️ Approve Campaign';
+    btnApproval.textContent = 'Approve Campaign';
     btnPublish.disabled = true;
     btnSchedule.disabled = true;
     callout.className = 'approval-callout pending';
     callout.innerHTML = `
-      <div class="callout-icon">⚠️</div>
+      <div class="callout-icon">!</div>
       <div class="callout-body">
         <strong>Approval Required</strong>
-        <p>This campaign is in <em>${activeCampaign.status.toUpperCase()}</em> mode. Publishing and scheduling are locked until explicit approval is granted.</p>
+        <p>This campaign is in <em>${escapeHtml(activeCampaign.status.toUpperCase())}</em> mode. Publishing and scheduling remain locked until explicit approval is granted.</p>
       </div>
     `;
   }
@@ -589,23 +832,37 @@ function setActiveCampaign(c) {
   document.getElementById('editor-body').value = activeCampaign.bodyCopy || '';
   document.getElementById('editor-cta').value = activeCampaign.callToAction || '';
   document.getElementById('editor-hashtags').value = (activeCampaign.hashtags || []).join(' ');
-  document.getElementById('editor-service-category').value = activeCampaign.serviceCategory || 'Everyday Help';
+
+  const catSelect = document.getElementById('editor-service-category');
+  catSelect.value = activeCampaign.serviceCategory || 'Personal Concierge';
+  if (!catSelect.value) catSelect.value = 'Personal Concierge';
 
   // Platforms
-  document.getElementById('plat-facebook').checked = activeCampaign.platforms.includes('facebook');
-  document.getElementById('plat-instagram').checked = activeCampaign.platforms.includes('instagram');
+  const plats = activeCampaign.platforms || ['facebook', 'instagram'];
+  document.getElementById('plat-facebook').checked = plats.includes('facebook');
+  document.getElementById('plat-instagram').checked = plats.includes('instagram');
 
   // Graphic Controls
   const g = activeCampaign.graphicData || {};
   document.getElementById('editor-aspect-ratio').value = activeCampaign.aspectRatio || '1:1';
-  document.getElementById('editor-graphic-badge').value = g.badgeText || 'Verified Local Service';
-  document.getElementById('editor-graphic-headline').value = g.headline || activeCampaign.headline || 'Little Big Help';
-  document.getElementById('editor-graphic-subhead').value = g.subhead || 'Small Tasks, Big Relief';
-  document.getElementById('editor-graphic-accent').value = g.accentColor || '#F26A5A';
-  document.getElementById('editor-graphic-bg').value = g.bgColor || '#2C3E50';
+  document.getElementById('editor-graphic-badge').value = g.badgeText || 'Sylhet Concierge';
+  document.getElementById('editor-graphic-headline').value = g.headline || activeCampaign.headline || 'Your day, handled with care.';
+  document.getElementById('editor-graphic-subhead').value = g.subhead || 'Personal Concierge • Local Assistance • Business & Digital Solutions';
+  document.getElementById('editor-graphic-accent').value = g.accentColor || '#B49A70';
+  document.getElementById('editor-graphic-bg').value = g.bgColor || '#172C27';
+  syncColorHexLabels();
 
   updateLivePreviewText();
   renderCanvas();
+}
+
+function syncColorHexLabels() {
+  const accentInput = document.getElementById('editor-graphic-accent');
+  const bgInput = document.getElementById('editor-graphic-bg');
+  const accentHex = accentInput?.parentElement?.querySelector('.color-hex');
+  const bgHex = bgInput?.parentElement?.querySelector('.color-hex');
+  if (accentHex && accentInput) accentHex.textContent = accentInput.value.toUpperCase();
+  if (bgHex && bgInput) bgHex.textContent = bgInput.value.toUpperCase();
 }
 
 function updateLivePreviewText() {
@@ -617,40 +874,43 @@ function updateLivePreviewText() {
   const cta = document.getElementById('editor-cta').value;
   const tags = document.getElementById('editor-hashtags').value;
 
-  const fullText = `${headline ? headline + '\n\n' : ''}${hook ? hook + '\n\n' : ''}${body ? body + '\n\n' : ''}${cta ? '👉 ' + cta + '\n\n' : ''}${tags}`;
+  const fullText = `${headline ? headline + '\n\n' : ''}${hook ? hook + '\n\n' : ''}${body ? body + '\n\n' : ''}${cta ? cta + '\n\n' : ''}${tags}`;
 
   document.getElementById('fb-preview-text').textContent = fullText;
   document.getElementById('ig-preview-text').textContent = fullText;
 }
 
-// Live inputs update previews
 ['editor-headline', 'editor-hook', 'editor-body', 'editor-cta', 'editor-hashtags'].forEach(id => {
   document.getElementById(id).addEventListener('input', updateLivePreviewText);
 });
 
 ['editor-graphic-badge', 'editor-graphic-headline', 'editor-graphic-subhead', 'editor-graphic-accent', 'editor-graphic-bg', 'editor-aspect-ratio'].forEach(id => {
-  document.getElementById(id).addEventListener('input', renderCanvas);
+  document.getElementById(id).addEventListener('input', () => {
+    syncColorHexLabels();
+    renderCanvas();
+  });
 });
 
-// Color Preset Themes
+// ALLORA Color Preset Themes
 document.getElementById('editor-graphic-theme').addEventListener('change', (e) => {
   const theme = e.target.value;
   const accentInput = document.getElementById('editor-graphic-accent');
   const bgInput = document.getElementById('editor-graphic-bg');
 
-  if (theme === 'coral_slate') {
-    accentInput.value = '#F26A5A';
-    bgInput.value = '#2C3E50';
+  if (theme === 'forest_gold') {
+    accentInput.value = '#B49A70';
+    bgInput.value = '#172C27';
+  } else if (theme === 'ivory_forest') {
+    accentInput.value = '#172C27';
+    bgInput.value = '#F4F0E7';
   } else if (theme === 'sage_forest') {
-    accentInput.value = '#6A8E7F';
-    bgInput.value = '#1C2E24';
-  } else if (theme === 'cream_coral') {
-    accentInput.value = '#F26A5A';
-    bgInput.value = '#FBF8F3';
+    accentInput.value = '#A6AEA0';
+    bgInput.value = '#172C27';
   } else if (theme === 'modern_dark') {
-    accentInput.value = '#00D2B4';
-    bgInput.value = '#0F172A';
+    accentInput.value = '#B49A70';
+    bgInput.value = '#292B29';
   }
+  syncColorHexLabels();
   renderCanvas();
 });
 
@@ -680,6 +940,15 @@ document.getElementById('btn-clear-custom-image').addEventListener('click', () =
 });
 
 // ----------------- GRAPHIC BANNER CANVAS ENGINE -----------------
+function isLightHex(hex) {
+  const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex || '');
+  if (!m) return false;
+  const r = parseInt(m[1], 16);
+  const g = parseInt(m[2], 16);
+  const b = parseInt(m[3], 16);
+  return (r * 0.299 + g * 0.587 + b * 0.114) > 165;
+}
+
 function renderCanvas() {
   const aspectRatio = document.getElementById('editor-aspect-ratio').value;
   let width = 1080;
@@ -705,155 +974,146 @@ function drawBannerOnContext(ctx, width, height) {
   const badgeText = document.getElementById('editor-graphic-badge').value;
   const headline = document.getElementById('editor-graphic-headline').value;
   const subhead = document.getElementById('editor-graphic-subhead').value;
-  const accentColor = document.getElementById('editor-graphic-accent').value;
-  const bgColor = document.getElementById('editor-graphic-bg').value;
+  const accentColor = document.getElementById('editor-graphic-accent').value || '#B49A70';
+  const bgColor = document.getElementById('editor-graphic-bg').value || '#172C27';
+  const lightSurface = !customImageObj && isLightHex(bgColor);
+
+  const primaryInk = lightSurface ? '#172C27' : '#F4F0E7';
+  const secondaryInk = lightSurface ? '#292B29' : '#D9D3C7';
+  const lineHairline = lightSurface ? 'rgba(23, 44, 39, 0.12)' : 'rgba(244, 240, 231, 0.1)';
 
   // Background Fill
   ctx.fillStyle = bgColor;
   ctx.fillRect(0, 0, width, height);
 
-  // If Custom Image is loaded
   if (customImageObj) {
-    // Draw image centered and contained/covered
     const hRatio = width / customImageObj.width;
     const vRatio = height / customImageObj.height;
     const ratio = Math.max(hRatio, vRatio);
     const centerShift_x = (width - customImageObj.width * ratio) / 2;
     const centerShift_y = (height - customImageObj.height * ratio) / 2;
-    ctx.drawImage(customImageObj, 0, 0, customImageObj.width, customImageObj.height,
-      centerShift_x, centerShift_y, customImageObj.width * ratio, customImageObj.height * ratio);
+    ctx.drawImage(
+      customImageObj,
+      0,
+      0,
+      customImageObj.width,
+      customImageObj.height,
+      centerShift_x,
+      centerShift_y,
+      customImageObj.width * ratio,
+      customImageObj.height * ratio
+    );
 
-    // Dark gradient overlay for text readability
-    const overlay = ctx.createLinearGradient(0, height * 0.4, 0, height);
-    overlay.addColorStop(0, 'rgba(0,0,0,0.1)');
-    overlay.addColorStop(1, 'rgba(0,0,0,0.85)');
+    const overlay = ctx.createLinearGradient(0, 0, 0, height);
+    overlay.addColorStop(0, 'rgba(23, 44, 39, 0.65)');
+    overlay.addColorStop(0.55, 'rgba(23, 44, 39, 0.45)');
+    overlay.addColorStop(1, 'rgba(23, 44, 39, 0.92)');
     ctx.fillStyle = overlay;
     ctx.fillRect(0, 0, width, height);
   } else {
-    // Modern geometric backdrop shapes
+    // Editorial architectural framing & subtle ambient radial warmth
     ctx.save();
-    // Ambient glowing circles
-    const grad1 = ctx.createRadialGradient(width * 0.85, height * 0.15, 50, width * 0.85, height * 0.15, 450);
-    grad1.addColorStop(0, hexToRgba(accentColor, 0.45));
-    grad1.addColorStop(1, hexToRgba(accentColor, 0));
-    ctx.fillStyle = grad1;
-    ctx.beginPath();
-    ctx.arc(width * 0.85, height * 0.15, 450, 0, Math.PI * 2);
-    ctx.fill();
-
-    const grad2 = ctx.createRadialGradient(width * 0.15, height * 0.85, 50, width * 0.15, height * 0.85, 450);
-    grad2.addColorStop(0, hexToRgba('#6A8E7F', 0.35));
-    grad2.addColorStop(1, hexToRgba('#6A8E7F', 0));
-    ctx.fillStyle = grad2;
-    ctx.beginPath();
-    ctx.arc(width * 0.15, height * 0.85, 450, 0, Math.PI * 2);
-    ctx.fill();
+    const grad = ctx.createRadialGradient(width * 0.85, height * 0.15, 40, width * 0.85, height * 0.15, 520);
+    grad.addColorStop(0, hexToRgba(accentColor, lightSurface ? 0.16 : 0.25));
+    grad.addColorStop(1, hexToRgba(accentColor, 0));
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, width, height);
     ctx.restore();
 
-    // Subtle decorative grid lines
-    ctx.strokeStyle = 'rgba(255,255,255,0.04)';
-    ctx.lineWidth = 1;
-    for (let x = 60; x < width; x += 120) {
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, height);
-      ctx.stroke();
-    }
+    // Inner editorial hairline frame
+    ctx.strokeStyle = lineHairline;
+    ctx.lineWidth = 2;
+    ctx.strokeRect(42, 42, width - 84, height - 84);
   }
 
-  // Draw Header Logo & Brand Name
-  const topMargin = 70;
-  const leftMargin = 70;
+  const topMargin = 84;
+  const leftMargin = 84;
 
+  // Draw Header Emblem & ALLORA Brand Wordmark
   if (brandLogoImg.complete && brandLogoImg.naturalWidth !== 0) {
     ctx.save();
-    ctx.beginPath();
-    ctx.arc(leftMargin + 32, topMargin + 32, 32, 0, Math.PI * 2);
+    roundRect(ctx, leftMargin, topMargin, 64, 64, 8);
     ctx.clip();
     ctx.drawImage(brandLogoImg, leftMargin, topMargin, 64, 64);
     ctx.restore();
   }
 
-  ctx.fillStyle = '#FFFFFF';
-  ctx.font = 'bold 32px sans-serif';
-  ctx.fillText('Little Big Help', leftMargin + 80, topMargin + 34);
+  ctx.fillStyle = primaryInk;
+  ctx.font = '600 34px "Cormorant Garamond", Georgia, serif';
+  ctx.fillText('ALLORA', leftMargin + 82, topMargin + 32);
 
   ctx.fillStyle = accentColor;
-  ctx.font = '500 18px sans-serif';
-  ctx.fillText('Small Tasks, Big Relief', leftMargin + 80, topMargin + 58);
+  ctx.font = '500 18px "Manrope", sans-serif';
+  ctx.fillText('Life, made lighter.', leftMargin + 82, topMargin + 58);
 
-  // Badge Pill
+  // Subtle Editorial Kicker Tag
   if (badgeText) {
-    const badgeY = topMargin + 130;
-    ctx.font = 'bold 20px sans-serif';
-    const textWidth = ctx.measureText(badgeText.toUpperCase()).width;
+    const badgeY = topMargin + 128;
+    ctx.font = '600 18px "Manrope", sans-serif';
+    const label = badgeText.toUpperCase();
+    const textWidth = ctx.measureText(label).width;
     const badgeWidth = textWidth + 36;
     const badgeHeight = 40;
 
-    ctx.fillStyle = accentColor;
-    roundRect(ctx, leftMargin, badgeY, badgeWidth, badgeHeight, 20);
+    ctx.fillStyle = hexToRgba(accentColor, lightSurface ? 0.14 : 0.2);
+    roundRect(ctx, leftMargin, badgeY, badgeWidth, badgeHeight, 4);
     ctx.fill();
 
-    ctx.fillStyle = '#FFFFFF';
-    ctx.fillText(badgeText.toUpperCase(), leftMargin + 18, badgeY + 27);
+    ctx.strokeStyle = accentColor;
+    ctx.lineWidth = 1.5;
+    roundRect(ctx, leftMargin, badgeY, badgeWidth, badgeHeight, 4);
+    ctx.stroke();
+
+    ctx.fillStyle = lightSurface ? '#172C27' : '#F4F0E7';
+    ctx.fillText(label, leftMargin + 18, badgeY + 26);
   }
 
-  // Headline (word-wrapped)
+  // Editorial Serif Headline
   const headlineY = topMargin + 250;
-  ctx.fillStyle = '#FFFFFF';
-  ctx.font = 'bold 64px sans-serif';
+  ctx.fillStyle = primaryInk;
+  ctx.font = '600 66px "Cormorant Garamond", Georgia, serif';
   const maxHeadlineWidth = width - (leftMargin * 2);
   const headlineLines = wrapText(ctx, headline, maxHeadlineWidth);
 
   let currentY = headlineY;
   headlineLines.forEach((line) => {
     ctx.fillText(line, leftMargin, currentY);
-    currentY += 76;
+    currentY += 78;
   });
 
-  // Subhead
+  // Clean Sans Subhead
   if (subhead) {
     currentY += 20;
-    ctx.fillStyle = '#E2E8F0';
-    ctx.font = '400 32px sans-serif';
+    ctx.fillStyle = secondaryInk;
+    ctx.font = '400 28px "Manrope", sans-serif';
     const subheadLines = wrapText(ctx, subhead, maxHeadlineWidth);
     subheadLines.forEach((line) => {
       ctx.fillText(line, leftMargin, currentY);
-      currentY += 44;
+      currentY += 42;
     });
   }
 
   // Bottom Contact Card
-  const cardHeight = 110;
-  const cardY = height - cardHeight - 60;
+  const cardHeight = 112;
+  const cardY = height - cardHeight - 72;
   const cardWidth = width - (leftMargin * 2);
 
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
-  roundRect(ctx, leftMargin, cardY, cardWidth, cardHeight, 16);
+  ctx.fillStyle = lightSurface ? 'rgba(23, 44, 39, 0.94)' : 'rgba(15, 31, 27, 0.72)';
+  roundRect(ctx, leftMargin, cardY, cardWidth, cardHeight, 6);
   ctx.fill();
 
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-  ctx.lineWidth = 2;
-  roundRect(ctx, leftMargin, cardY, cardWidth, cardHeight, 16);
+  ctx.strokeStyle = hexToRgba(accentColor, 0.45);
+  ctx.lineWidth = 1.5;
+  roundRect(ctx, leftMargin, cardY, cardWidth, cardHeight, 6);
   ctx.stroke();
 
-  // WhatsApp Icon circle
-  ctx.fillStyle = '#25D366';
-  ctx.beginPath();
-  ctx.arc(leftMargin + 50, cardY + (cardHeight / 2), 28, 0, Math.PI * 2);
-  ctx.fill();
+  ctx.fillStyle = '#B49A70';
+  ctx.font = '700 18px "Manrope", sans-serif';
+  ctx.fillText('SYLHET CONCIERGE & ASSISTANCE', leftMargin + 32, cardY + 40);
 
-  ctx.fillStyle = '#FFFFFF';
-  ctx.font = 'bold 26px sans-serif';
-  ctx.fillText('💬', leftMargin + 37, cardY + (cardHeight / 2) + 9);
-
-  ctx.fillStyle = '#FFFFFF';
-  ctx.font = 'bold 26px sans-serif';
-  ctx.fillText('Chat with Little Big Help on WhatsApp', leftMargin + 100, cardY + 46);
-
-  ctx.fillStyle = '#94A3B8';
-  ctx.font = '500 22px sans-serif';
-  ctx.fillText('+880 1865-383565 • Sylhet, Bangladesh', leftMargin + 100, cardY + 80);
+  ctx.fillStyle = '#F4F0E7';
+  ctx.font = '500 26px "Manrope", sans-serif';
+  ctx.fillText('WhatsApp: +880 1865-383565', leftMargin + 32, cardY + 80);
 }
 
 function wrapText(ctx, text, maxWidth) {
@@ -900,13 +1160,13 @@ function hexToRgba(hex, alpha) {
     c = '0x' + c.join('');
     return `rgba(${[(c >> 16) & 255, (c >> 8) & 255, c & 255].join(',')},${alpha})`;
   }
-  return `rgba(242,106,90,${alpha})`;
+  return `rgba(180,154,112,${alpha})`;
 }
 
 // Download Graphic Button
 document.getElementById('btn-download-graphic').addEventListener('click', () => {
   const link = document.createElement('a');
-  link.download = `LittleBigHelp-${(activeCampaign?.title || 'graphic').toLowerCase().replace(/\s+/g, '-')}.png`;
+  link.download = `ALLORA-${(activeCampaign?.title || 'graphic').toLowerCase().replace(/\s+/g, '-')}.png`;
   link.href = canvasFb.toDataURL('image/png');
   link.click();
 });
@@ -946,7 +1206,7 @@ document.getElementById('btn-save-draft').addEventListener('click', async () => 
     subhead: document.getElementById('editor-graphic-subhead').value,
     accentColor: document.getElementById('editor-graphic-accent').value,
     bgColor: document.getElementById('editor-graphic-bg').value,
-    textColor: '#FFFFFF'
+    textColor: '#F4F0E7'
   };
 
   const payload = {
@@ -963,7 +1223,7 @@ document.getElementById('btn-save-draft').addEventListener('click', async () => 
   };
 
   try {
-    const res = await authFetch(`/api/campaigns/${activeCampaign.id}`, {
+    const res = await authFetch(`/api/campaigns/${encodeURIComponent(activeCampaign.id)}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -971,9 +1231,9 @@ document.getElementById('btn-save-draft').addEventListener('click', async () => 
     const d = await res.json();
     if (d.success) {
       if (d.approvalRevoked) {
-        showAlert('⚠️ Content was modified: Previous approval has been automatically invalidated and status reset to Draft. Re-approval is required before publishing.', 'warning', 8000);
+        showAlert('Content was modified: Previous approval has been invalidated and status reset to Draft. Re-approval is required before publishing.', 'warning', 8000);
       } else {
-        showAlert('Draft saved successfully!', 'success');
+        showAlert('Draft saved successfully.', 'success');
       }
       setActiveCampaign(d.campaign);
       await fetchCampaigns();
@@ -994,12 +1254,10 @@ btnToggleApproval.addEventListener('click', () => {
   if (!activeCampaign) return;
 
   if (activeCampaign.approval?.approved) {
-    // Revoke
     if (confirm('Are you sure you want to revoke approval? This will lock the Publish and Schedule buttons.')) {
       revokeApproval();
     }
   } else {
-    // Open explicit approval modal
     document.getElementById('approval-modal-title').textContent = activeCampaign.title;
     document.getElementById('approval-modal-category').textContent = `Category: ${activeCampaign.serviceCategory}`;
     modalApproval.classList.remove('hidden');
@@ -1009,12 +1267,12 @@ btnToggleApproval.addEventListener('click', () => {
 btnConfirmApproval.addEventListener('click', async () => {
   modalApproval.classList.add('hidden');
   try {
-    const res = await authFetch(`/api/campaigns/${activeCampaign.id}/approve`, {
+    const res = await authFetch(`/api/campaigns/${encodeURIComponent(activeCampaign.id)}/approve`, {
       method: 'POST'
     });
     const d = await res.json();
     if (d.success) {
-      showAlert('🛡️ Campaign explicitly approved! Publish and Schedule controls are now unlocked.', 'success');
+      showAlert('Campaign explicitly approved. Publish and Schedule controls are now unlocked.', 'success');
       setActiveCampaign(d.campaign);
       await fetchCampaigns();
     } else {
@@ -1027,7 +1285,7 @@ btnConfirmApproval.addEventListener('click', async () => {
 
 async function revokeApproval() {
   try {
-    const res = await authFetch(`/api/campaigns/${activeCampaign.id}/revoke-approval`, {
+    const res = await authFetch(`/api/campaigns/${encodeURIComponent(activeCampaign.id)}/revoke-approval`, {
       method: 'POST'
     });
     const d = await res.json();
@@ -1062,7 +1320,7 @@ btnConfirmPublish.addEventListener('click', async () => {
   publishSpinner.classList.remove('hidden');
 
   try {
-    const res = await authFetch(`/api/campaigns/${activeCampaign.id}/publish`, {
+    const res = await authFetch(`/api/campaigns/${encodeURIComponent(activeCampaign.id)}/publish`, {
       method: 'POST'
     });
     const data = await res.json();
@@ -1072,7 +1330,7 @@ btnConfirmPublish.addEventListener('click', async () => {
     }
 
     modalPublish.classList.add('hidden');
-    showAlert('🚀 Post published successfully to Meta social channels!', 'success');
+    showAlert('Post published successfully to Meta social channels.', 'success');
     await fetchCampaigns();
   } catch (err) {
     showAlert('Publication Error: ' + err.message, 'danger');
@@ -1103,7 +1361,7 @@ btnConfirmSchedule.addEventListener('click', async () => {
   }
 
   try {
-    const res = await authFetch(`/api/campaigns/${activeCampaign.id}/schedule`, {
+    const res = await authFetch(`/api/campaigns/${encodeURIComponent(activeCampaign.id)}/schedule`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -1127,11 +1385,11 @@ btnConfirmSchedule.addEventListener('click', async () => {
 document.querySelectorAll('[data-close-modal]').forEach(btn => {
   btn.addEventListener('click', () => {
     const target = btn.dataset.closeModal;
-    document.getElementById(target).classList.add('hidden');
+    document.getElementById(target)?.classList.add('hidden');
   });
 });
 
-// ----------------- SOCIAL ACCOUNTS / META CONFIG (Priority 3) -----------------
+// ----------------- SOCIAL ACCOUNTS / META CONFIG -----------------
 async function fetchMetaSettings() {
   try {
     const res = await authFetch('/api/meta/settings');
@@ -1159,7 +1417,7 @@ function renderMetaSettingsUI() {
   if (metaSettings.hasToken) {
     hint.textContent = `Stored Token: ${metaSettings.maskedToken} (Graph API ${metaSettings.graphApiVersion || 'v26.0'})`;
   } else {
-    hint.textContent = 'No token stored. Please paste your Meta Page Access Token.';
+    hint.textContent = 'No token stored. Paste your Meta Page Access Token when ready.';
   }
 
   const statusChanFb = document.getElementById('status-chan-fb');
@@ -1175,16 +1433,16 @@ function renderMetaSettingsUI() {
 
     if (statusChanFb && cardChanFb) {
       cardChanFb.classList.add('active');
-      statusChanFb.innerHTML = '<span class="badge-active">✓ Active / Connected</span>';
+      statusChanFb.innerHTML = '<span class="badge-active">&check; Active / Connected</span>';
     }
     if (statusChanIg && cardChanIg && metaSettings.instagramAccountId) {
       cardChanIg.classList.add('active');
-      statusChanIg.innerHTML = '<span class="badge-active">✓ Active / Linked</span>';
+      statusChanIg.innerHTML = '<span class="badge-active">&check; Active / Linked</span>';
     }
   } else {
     badge.className = 'connection-pill offline';
-    badgeText.textContent = 'Disconnected';
-    topbarMetaStatus.innerHTML = '<span class="status-indicator danger"></span><span>Meta: Disconnected</span>';
+    badgeText.textContent = 'Pending Credentials';
+    topbarMetaStatus.innerHTML = '<span class="status-indicator warning"></span><span>Meta: Pending Credentials</span>';
     navMetaDot.className = 'connection-status-dot offline';
 
     if (statusChanFb && cardChanFb) {
@@ -1193,7 +1451,7 @@ function renderMetaSettingsUI() {
     }
     if (statusChanIg && cardChanIg) {
       cardChanIg.classList.remove('active');
-      statusChanIg.innerHTML = '<span class="badge-pending">Pending Token & Account ID</span>';
+      statusChanIg.innerHTML = '<span class="badge-pending">Pending Token &amp; Account ID</span>';
     }
   }
 
@@ -1210,16 +1468,14 @@ function renderMetaSettingsUI() {
   }
 }
 
-// Toggle token visibility
 let tokenMasked = true;
 document.getElementById('btn-toggle-token-mask').addEventListener('click', () => {
   const tokenInput = document.getElementById('setting-page-access-token');
   tokenMasked = !tokenMasked;
   tokenInput.type = tokenMasked ? 'password' : 'text';
-  document.getElementById('btn-toggle-token-mask').textContent = tokenMasked ? '👁️ Show' : '🔒 Hide';
+  document.getElementById('btn-toggle-token-mask').textContent = tokenMasked ? 'Show' : 'Hide';
 });
 
-// Save Meta Settings
 document.getElementById('meta-settings-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const payload = {
@@ -1239,7 +1495,7 @@ document.getElementById('meta-settings-form').addEventListener('submit', async (
     });
     const d = await res.json();
     if (d.success) {
-      showAlert('Meta configuration saved successfully!', 'success');
+      showAlert('Meta configuration saved.', 'success');
       document.getElementById('setting-page-access-token').value = '';
       await fetchMetaSettings();
     }
@@ -1248,7 +1504,6 @@ document.getElementById('meta-settings-form').addEventListener('submit', async (
   }
 });
 
-// Test Connection (Real Meta Graph API v26.0)
 document.getElementById('btn-test-meta-connection').addEventListener('click', async () => {
   const btn = document.getElementById('btn-test-meta-connection');
   const spinner = document.getElementById('test-conn-spinner');
@@ -1268,18 +1523,18 @@ document.getElementById('btn-test-meta-connection').addEventListener('click', as
     if (d.connected) {
       resultBox.className = 'test-result-box success';
       resultBox.innerHTML = `
-        <strong>✓ Meta Connection Verified!</strong><br />
-        Connected Page: <strong>${escapeHtml(d.pageInfo.name)}</strong> (ID: ${d.pageInfo.id})<br />
+        <strong>&check; Meta Connection Verified</strong><br />
+        Connected Page: <strong>${escapeHtml(d.pageInfo.name)}</strong> (ID: ${escapeHtml(d.pageInfo.id)})<br />
         Category: ${escapeHtml(d.pageInfo.category)}<br />
-        Graph API: ${d.graphApiVersion || 'v26.0'}<br />
-        Status: Token verified and ready for live publishing.
+        Graph API: ${escapeHtml(d.graphApiVersion || 'v26.0')}<br />
+        Status: Token verified and ready for publishing.
       `;
-      showAlert(`Verified Meta Page "${d.pageInfo.name}"!`, 'success');
+      showAlert(`Verified Meta Page "${d.pageInfo.name}".`, 'success');
     } else {
       resultBox.className = 'test-result-box error';
       resultBox.innerHTML = `
-        <strong>Connection Failed:</strong> ${escapeHtml(d.error)}<br />
-        <small class="text-muted">Ensure your token is valid and includes the required pages_manage_posts and instagram_content_publish permissions.</small>
+        <strong>Connection Pending / Failed:</strong> ${escapeHtml(d.error)}<br />
+        <small class="text-muted">Ensure your Page Access Token is valid and includes pages_manage_posts and instagram_content_publish permissions.</small>
       `;
     }
     await fetchMetaSettings();
@@ -1295,10 +1550,9 @@ document.getElementById('btn-test-meta-connection').addEventListener('click', as
 
 function escapeHtml(str) {
   if (!str) return '';
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
-// Check Instagram Webhook Readiness
 const btnCheckWebhook = document.getElementById('btn-check-webhook-status');
 if (btnCheckWebhook) {
   btnCheckWebhook.addEventListener('click', async () => {
@@ -1316,10 +1570,10 @@ if (btnCheckWebhook) {
         const isReady = data.status === 'ready';
         feedback.className = `test-result-box ${isReady ? 'success' : 'warning'}`;
         feedback.innerHTML = `
-          <strong>${isReady ? '✓ Webhook Endpoint Ready' : '⚠️ Configuration Required'}</strong><br />
+          <strong>${isReady ? '&check; Webhook Endpoint Ready' : 'Configuration Required'}</strong><br />
           Endpoint: <code>${escapeHtml(data.endpoint)}</code><br />
-          Verification Token: <strong>${data.configuration.verifyTokenConfigured ? 'Configured (✓)' : 'Pending (Set META_WEBHOOK_VERIFY_TOKEN)'}</strong><br />
-          App Secret: <strong>${data.configuration.appSecretConfigured ? 'Configured (✓)' : 'Pending (Set META_APP_SECRET)'}</strong><br />
+          Verification Token: <strong>${data.configuration.verifyTokenConfigured ? 'Configured (&check;)' : 'Pending (Set META_WEBHOOK_VERIFY_TOKEN)'}</strong><br />
+          App Secret: <strong>${data.configuration.appSecretConfigured ? 'Configured (&check;)' : 'Pending (Set META_APP_SECRET)'}</strong><br />
           <small class="text-muted mt-1" style="display:block;">${escapeHtml(data.message)}</small>
         `;
       }
@@ -1335,7 +1589,8 @@ if (btnCheckWebhook) {
     }
   });
 }
-// ----------------- DATA PERSISTENCE & BACKUP (Priority 2) -----------------
+
+// ----------------- DATA PERSISTENCE & BACKUP -----------------
 const btnExportBackup = document.getElementById('btn-export-backup');
 const btnRestoreBackup = document.getElementById('btn-restore-backup');
 const fileRestoreBackup = document.getElementById('file-restore-backup');
@@ -1349,12 +1604,12 @@ if (btnExportBackup) {
       const downloadUrl = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = downloadUrl;
-      a.download = `lbh-marketing-backup-${Date.now()}.json`;
+      a.download = `allora-workspace-backup-${Date.now()}.json`;
       document.body.appendChild(a);
       a.click();
       a.remove();
       window.URL.revokeObjectURL(downloadUrl);
-      showAlert('✓ Full JSON backup downloaded successfully!', 'success');
+      showAlert('Full JSON backup downloaded.', 'success');
     } catch (err) {
       showAlert('Backup error: ' + err.message, 'danger');
     }
@@ -1382,7 +1637,7 @@ if (btnRestoreBackup && fileRestoreBackup) {
       });
       const data = await res.json();
       if (data.success) {
-        showAlert(`✓ ${data.message}`, 'success');
+        showAlert(data.message, 'success');
         await fetchCampaigns();
       } else {
         showAlert(data.error || 'Restore failed', 'danger');
@@ -1426,7 +1681,7 @@ if (passcodeChangeForm) {
         }
         currentPasscodeInput.value = '';
         newPasscodeInput.value = '';
-        showAlert('✓ Administrator passcode updated successfully.', 'success');
+        showAlert('Administrator passcode updated.', 'success');
       } else {
         if (passcodeChangeAlert) {
           passcodeChangeAlert.className = 'alert alert-danger';

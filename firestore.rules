@@ -1,14 +1,36 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
     function isValidId(id) {
-      return id is string && id.size() > 0 && id.size() <= 128;
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidInquiry(data) {
+      return data.id is string && data.id.size() > 0 && data.id.size() <= 128
+        && data.customerName is string && data.customerName.size() > 0 && data.customerName.size() <= 120
+        && data.whatsappNumber is string && data.whatsappNumber.size() > 0 && data.whatsappNumber.size() <= 40
+        && data.serviceCategory is string && data.serviceCategory.size() > 0 && data.serviceCategory.size() <= 100
+        && data.taskDescription is string && data.taskDescription.size() > 0 && data.taskDescription.size() <= 3000
+        && data.status in ['new', 'in_review', 'confirmed', 'completed', 'archived']
+        && data.createdAt is string && data.createdAt.size() <= 64;
     }
 
     match /campaigns/{campaignId} {
       allow get, list: if true;
-      allow write: if isValidId(campaignId) && request.resource.data.id is string && request.resource.data.title is string;
+      allow write: if isValidId(campaignId)
+        && request.resource.data.id is string && request.resource.data.id.size() <= 128
+        && request.resource.data.title is string && request.resource.data.title.size() <= 300;
       allow delete: if isValidId(campaignId);
+    }
+
+    match /inquiries/{inquiryId} {
+      allow get, list: if true;
+      allow create, update: if isValidId(inquiryId) && isValidInquiry(request.resource.data);
+      allow delete: if isValidId(inquiryId);
     }
 
     match /settings/{settingId} {
